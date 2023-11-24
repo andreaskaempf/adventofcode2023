@@ -1,0 +1,21 @@
+# Initialize a directory for Advent of Code
+
+if [ "$1" == "" ]
+then
+  echo "Missing day directory name (e.g., day01)"
+  exit
+fi
+
+if [ -d $1 ]
+then
+  echo "Directory already exists"
+  exit
+fi
+
+# Create directory, copy template files, and initialize module
+mkdir $1
+cd $1
+cp ../template/* .
+rm -v main_test.go
+go mod init $1
+
