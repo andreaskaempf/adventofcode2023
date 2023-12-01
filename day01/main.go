@@ -1,6 +1,6 @@
 // Advent of Code 2023, Day 01
 //
-// Find digits in a string, come first and last digit on each line to
+// Find digits in a string, combine first and last digit on each line to
 // make a number, and add these up. For part 2, look for embedded names
 // of numbers as well, complicated as last & first letters are shared
 // if they are the same.

@@ -4,10 +4,10 @@ My solutions for the Advent of Code 2023,
 see https://adventofcode.com/2023
 Line counts exclude blank lines and comments, and utility functions in utils.go
 
-* **Day 1** (Go): Find digits in a string, come first and last digit on each
+* **Day 1** (Go): Find digits in a string, combine first and last digit on each
   line to make a number, and add these up. For part 2, look for embedded names
   of numbers as well, complicated as last & first letters are shared if they
-  are the same.  Problem description (*easy*)
+  are the same.
 
 To compile and run a **Go** program
 * Change into the directory with the program
