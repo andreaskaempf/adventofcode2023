@@ -9,6 +9,12 @@ Line counts exclude blank lines and comments, and utility functions in utils.go
   of numbers as well, complicated as last & first letters are shared if they
   are the same.
 
+* **Day 2** (Go): Given a list of games, each with a list of 
+  red/green/blue cubes drawn from a bag, determine which games are possible 
+  with a given number of red, green, and blue cubes. For Part 2, determine 
+  the minimum number of cubes of each colour required to play all the
+  turns in a game, and multiply these together.
+
 To compile and run a **Go** program
 * Change into the directory with the program
 * `go mod init day01`  (*only if go.mod does not yet exist*)
