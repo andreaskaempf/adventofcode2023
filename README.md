@@ -2,7 +2,6 @@
 
 My solutions for the Advent of Code 2023, 
 see https://adventofcode.com/2023
-Line counts exclude blank lines and comments, and utility functions in utils.go
 
 * **Day 1** (Go): Find digits in a string, combine first and last digit on each
   line to make a number, and add these up. For part 2, look for embedded names
@@ -14,6 +13,11 @@ Line counts exclude blank lines and comments, and utility functions in utils.go
   with a given number of red, green, and blue cubes. For Part 2, determine 
   the minimum number of cubes of each colour required to play all the
   turns in a game, and multiply these together.
+
+* **Day 3** (Go): Given a 2-d surface of digits and special characters, 
+  find any embedded numbers that are adjacent to special characters, and
+  add them up. For Part 2, find any pairs of numbers that are adjacent to 
+  the same asterisk, and sum up the products of these pairs.
 
 To compile and run a **Go** program
 * Change into the directory with the program
