@@ -19,6 +19,13 @@ see https://adventofcode.com/2023
   add them up. For Part 2, find any pairs of numbers that are adjacent to 
   the same asterisk, and sum up the products of these pairs.
 
+* **Day 4** (Go): You are given a list of "cards", each with two lists of 
+  numbers separated by a vertical bar. Some of the numbers in the right 
+  list are also in the left list. For Part 1, calculate "points" for each 
+  card by adding up 1, 2, 4, ... for each match. For Part 2, make a copy 
+  of the next n cards, where n is the number of matches, and count up the 
+  cards at the end.
+
 To compile and run a **Go** program
 * Change into the directory with the program
 * `go mod init day01`  (*only if go.mod does not yet exist*)
