@@ -16,7 +16,7 @@ import (
 	"strings"
 )
 
-// A card
+// A card, just keep track of number of matches and copies
 type Card struct {
 	matches int // number of matches
 	copies  int // number of copies of this card
@@ -28,9 +28,9 @@ func main() {
 	// Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
 	fname := "sample.txt"
 	fname = "input.txt"
-	lines := readLines(fname)
-	cards := []Card{}
-	for _, l := range lines {
+	//fname = "day04_big_input.txt"
+	cards := []Card{} // list of cards
+	for _, l := range readLines(fname) {
 
 		// Extract numbers to left and right of bar
 		parts := strings.Split(l, " ")
@@ -44,12 +44,10 @@ func main() {
 			if w == "|" {
 				doingRight = true
 				continue
-			}
-			n := atoi(w)
-			if doingRight {
-				right = append(right, n)
+			} else if doingRight {
+				right = append(right, atoi(w))
 			} else {
-				left = append(left, n)
+				left = append(left, atoi(w))
 			}
 		}
 
@@ -71,12 +69,12 @@ func main() {
 	var ans1, ans2 int
 	for _, c := range cards {
 		points := int(math.Pow(2, float64(c.matches-1)))
-		ans1 += int(points)
+		ans1 += points
 	}
 	fmt.Println("Part 1:", ans1) // s/b 13 for sample, 22193 for input
 
-	// Part 2: create copies of one card for each match card,
-	// count up how many cards at the end
+	// Part 2: for each card, create copies of subsequent cards for each match,
+	// then count up how many cards at the end
 	for cn := 0; cn < len(cards); cn++ {
 		card := cards[cn]
 		for i := 1; i <= card.matches; i++ {

@@ -26,6 +26,15 @@ see https://adventofcode.com/2023
   of the next n cards, where n is the number of matches, and count up the 
   cards at the end.
 
+* **Day 5** (Go): Given a list of "seeds" (numbers), go through a series 
+  of transformations for each seed, based on tables. Each table is a tuple 
+  (dst, src, n). If the number is within src ..  src+n,  it is assigned 
+  to dst. If no dst is found, the dst is the same as src for that 
+  transformation. For Part 1, find the lowest final transformation. 
+  Part 2 is the same, but treat each pair of "seeds" as start and length 
+  of a range. Brute force is okay in Go, but would be faster with 
+  concurrency, memoization, or a smarter approach.
+
 To compile and run a **Go** program
 * Change into the directory with the program
 * `go mod init day01`  (*only if go.mod does not yet exist*)
