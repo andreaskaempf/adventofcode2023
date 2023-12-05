@@ -22,6 +22,14 @@ var seeds []int
 var maps map[string][][]int
 var sections []string
 
+// For memoization
+/*type Key struct {
+	section string
+	seed    int
+}*/
+
+//var cache map[Key]int
+
 func main() {
 
 	// Variables for the inputs
@@ -30,6 +38,7 @@ func main() {
 	sections = []string{"seed-to-soil", "soil-to-fertilizer",
 		"fertilizer-to-water", "water-to-light", "light-to-temperature",
 		"temperature-to-humidity", "humidity-to-location"}
+	//cache = map[Key]int{}
 
 	// Read and parse the input file
 	fname := "sample.txt"
@@ -83,6 +92,13 @@ func processSeed(seed int) int {
 	src := seed
 	for _, sect := range sections {
 
+		// Check the cache
+		/*key := Key{sect, src}
+		if val, ok := cache[key]; ok {
+			src = val
+			continue
+		}*/
+
 		// Find the destination corresponding to the current source
 		dst := -1
 		for _, ranges := range maps[sect] {
@@ -96,6 +112,11 @@ func processSeed(seed int) int {
 		if dst == -1 {
 			dst = src
 		}
+
+		// Add to cache
+		// TODO: disabled, because uses too much memory, need to
+		// shorten the section names
+		//cache[key] = dst
 
 		// Source of next transformation is the destination of this one
 		src = dst
