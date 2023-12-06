@@ -59,6 +59,15 @@ func atof(s string) float64 {
 	return float64(n)
 }
 
+// Parse a list of integers
+func parseList(s string) []int {
+	nums := []int{}
+	for _, n := range strings.Split(s, " ") {
+		nums = append(nums, atoi(n))
+	}
+	return nums
+}
+
 // Maximum of a list (of ints, floats, or strings, using generics)
 func max[T int | float64 | string](l []T) T {
 	var y T

@@ -32,8 +32,15 @@ see https://adventofcode.com/2023
   to dst. If no dst is found, the dst is the same as src for that 
   transformation. For Part 1, find the lowest final transformation. 
   Part 2 is the same, but treat each pair of "seeds" as start and length 
-  of a range. Brute force is okay in Go, but would be faster with 
-  concurrency, memoization, or a smarter approach.
+  of a range. Brute force takes under 5 minutes to run in Go, but would be 
+  faster with concurrency, memoization, or a smarter approach.
+
+* **Day 6** (Go): Simulate a toy boat race, in which you hold down a button
+  to recharge a motor, which lets the boat go faster. Distance is the speed
+  muliplied by remaining time. Find the number of ways you can hold down the
+  button, so as to exceed the previous maximum distance given. For part 2, just
+  one race, but much bigger number (still almost instantaneous using brute
+  force).
 
 To compile and run a **Go** program
 * Change into the directory with the program
