@@ -42,6 +42,11 @@ see https://adventofcode.com/2023
   one race, but much bigger number (still almost instantaneous using brute
   force).
 
+* **Day 7** (Go): Given some hands of 5 cards, sort them by poker rank. 
+  For part 2, replace instances of J (joker) with which ever other letter
+  from the hand, that yields the best poker hand type. Answer for both 
+  parts is the sumproduct of the rank (sorted sequence) times a given bid.
+
 To compile and run a **Go** program
 * Change into the directory with the program
 * `go mod init day01`  (*only if go.mod does not yet exist*)
