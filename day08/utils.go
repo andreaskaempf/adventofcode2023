@@ -19,21 +19,12 @@ func readLines(filename string) []string {
 	// Split into lines
 	lines := strings.Split(string(data), "\n")
 
-	// Remove any blank lines
+	// Remove any trailing blank lines
 	for len(lines) > 0 && len(lines[len(lines)-1]) == 0 {
 		lines = lines[:len(lines)-1]
 	}
 
 	return lines
-}
-
-// Simple inline if-then-else
-func ifElse[T int | float64 | byte | string](cond bool, a, b T) T {
-	if cond {
-		return a
-	} else {
-		return b
-	}
 }
 
 // Panic if a test condition is not true

@@ -54,17 +54,18 @@ func main() {
 	// seem to be repeating, so use them as the basis for finding an answer
 	lengths := []int{}
 	for _, s := range locs {
-		n := nSteps(s, "any", 0) // path to any "xxZ"
+		n := nSteps(s, "any", 0) // length of path to any "xxZ"
 		lengths = append(lengths, n)
 	}
 
 	// Search multiples of the first path length to find the one that aligns
 	// with all paths; multiplying them does not work, must be a common divisor
-	// or something, so this is very slow
+	// or something, so this is a bit slow
 	fmt.Println("Lengths:", lengths)
 	lowest := lengths[0] // use the first length as repeating interval
 	steps := lowest
 	for {
+		// Check if the number of steps can be divided by all lengths
 		//fmt.Println("Trying", steps)
 		foundIt := true
 		for i := 0; i < len(lengths); i++ {
@@ -72,16 +73,21 @@ func main() {
 				foundIt = false
 			}
 		}
+
+		// If yes, then we have the answer
 		if foundIt {
 			break
 		}
+
+		// Otherwise, try the next increment
 		steps += lowest
 	}
 	fmt.Println("Part 2:", steps) // 22103062509257
 }
 
-// Number of steps to get from A to B, given starting path position p.
-// If B is "any", finds the first destination that ends in 'Z'
+// Find the number of steps to get from A to B, given starting
+// path position p. If B is "any", finds the first destination
+// that ends in 'Z'
 func nSteps(A, B string, p int) int {
 	var steps int
 	loc := A
@@ -105,10 +111,11 @@ func nSteps(A, B string, p int) int {
 			fmt.Println("Aborting")
 			return -1
 		}
-		// If "AnyZ" is true, stop at the first destination that ends with 'Z'
+		// If destination is "any", stop at the first destination that
+		// ends with 'Z'
 		if B == "any" && loc[2] == 'Z' {
 			fmt.Println(A, "->", loc, "after", steps, "steps")
-			return steps // uncomment this, and you will see the repeating intervals
+			return steps // comment this to see the repeating intervals
 		}
 	}
 	return steps

@@ -21,7 +21,7 @@ func readLines(filename string) []string {
 	// Split into lines
 	lines := strings.Split(string(data), "\n")
 
-	// Remove any blank lines
+	// Remove any trailing blank lines
 	for len(lines) > 0 && len(lines[len(lines)-1]) == 0 {
 		lines = lines[:len(lines)-1]
 	}
