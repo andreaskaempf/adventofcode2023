@@ -1,5 +1,12 @@
 // Advent of Code 2023, Day 08
 //
+// Read a list of left/right instructions, and the left/right adjacencies
+// for a set of nodes. For  Part 1, calculate the number of steps required
+// to get from node "AAA" to "ZZZ". For Part 2, calculate the first step
+// where all routes from ??A lead to any ??Z. Part 2 solution finds and
+// takes into account the repeating length of each ??A to ??Z, but uses
+// brute force to find the time when they align, not very efficient.
+//
 // AK, 8 Dec 2023
 
 package main
@@ -13,11 +20,14 @@ type Node struct {
 	id, L, R string
 }
 
+// Map of nodes and path
+var nodes map[string]Node
+var path string
+
 func main() {
 
 	// Read the input file into path and dict of nodes
-	var path string
-	nodes := map[string]Node{}
+	nodes = map[string]Node{} // initialize
 	fname := "sample3.txt"
 	fname = "input.txt"
 	for _, l := range readLines(fname) {
@@ -30,78 +40,76 @@ func main() {
 	}
 
 	// Part 1: navigate path from AAA to ZZZ, count steps
-	loc := "AAA"        // current location, start at AAA
-	steps := 0          // number of steps so far
-	pos := 0            // position in path
-	_, ok := nodes[loc] // Skip part 1 if AAA not found
-	if ok {
-		for loc != "ZZZ" { // continue until we reach ZZZ
-			n, _ := nodes[loc]    // get current node
-			if path[pos] == 'L' { // Get next location
-				loc = n.L
-			} else {
-				loc = n.R
-			}
-			steps++
-			pos++
-			if pos >= len(path) {
-				pos = 0
-			}
-		}
-		fmt.Println("Part 1:", steps)
-	}
+	fmt.Println("Part 1:", nSteps("AAA", "ZZZ", 0))
 
-	// Part 2: same, simulataneously navigate all paths from xxA to xxZ
-	locs := []string{}       // starting/current locations
-	ends := map[string]int{} // corresponding ending locations
+	// Part 2: first find all starting nodes, i.e., those that end in A
+	locs := []string{}
 	for k := range nodes {
 		if k[2] == 'A' {
 			locs = append(locs, k)
-			end := k[:2] + "Z"
-			ends[end] = 1
 		}
 	}
-	fmt.Println(locs, ends)
 
-	// Navigate to subsequent nodes, until all on ending node
-	steps = 0
-	pos = 0
+	// Get path lengths from each start to any dest that ends in Z; these
+	// seem to be repeating, so use them as the basis for finding an answer
+	lengths := []int{}
+	for _, s := range locs {
+		n := nSteps(s, "any", 0) // path to any "xxZ"
+		lengths = append(lengths, n)
+	}
+
+	// Search multiples of the first path length to find the one that aligns
+	// with all paths; multiplying them does not work, must be a common divisor
+	// or something, so this is very slow
+	fmt.Println("Lengths:", lengths)
+	lowest := lengths[0] // use the first length as repeating interval
+	steps := lowest
 	for {
-
-		// Count up how many destinations we have reached
-		arrived := 0
-		for i := 0; i < len(locs); i++ {
-			_, isEnd := ends[locs[i]]
-			if isEnd { //locs[i][2] == 'Z' && in(locs[i], ends) {
-				arrived++
+		//fmt.Println("Trying", steps)
+		foundIt := true
+		for i := 0; i < len(lengths); i++ {
+			if steps%lengths[i] != 0 {
+				foundIt = false
 			}
 		}
-		if arrived > 2 { // occasional progress
-			fmt.Println(steps, arrived, locs)
-		}
-		if arrived == len(locs) { // stop when all arrived
+		if foundIt {
 			break
 		}
+		steps += lowest
+	}
+	fmt.Println("Part 2:", steps) // 22103062509257
+}
 
-		// Move each location one iteration according to current position in
-		// the route
-		for i := 0; i < len(locs); i++ {
-			n, _ := nodes[locs[i]] // get current node
-			//assert(ok, locs[i]+" not found")
-			if path[pos] == 'L' { // Get next location
-				locs[i] = n.L
-			} else {
-				//assert(path[pos] == 'R', "Invalid path")
-				locs[i] = n.R
-			}
+// Number of steps to get from A to B, given starting path position p.
+// If B is "any", finds the first destination that ends in 'Z'
+func nSteps(A, B string, p int) int {
+	var steps int
+	loc := A
+	pos := p
+	for loc != B { // continue until we reach destination
+		//fmt.Println(steps, pos, loc)
+		n, _ := nodes[loc] // get current node
+		//assert(ok, loc+" not found")
+		if path[pos] == 'L' { // Get next location
+			loc = n.L
+		} else {
+			//assert(path[pos] == 'R', "Invalid path")
+			loc = n.R
 		}
-
-		// Next position
 		steps++
 		pos++
 		if pos >= len(path) {
 			pos = 0
 		}
+		if steps > 1000000 { // avoid endless loop, should never happen
+			fmt.Println("Aborting")
+			return -1
+		}
+		// If "AnyZ" is true, stop at the first destination that ends with 'Z'
+		if B == "any" && loc[2] == 'Z' {
+			fmt.Println(A, "->", loc, "after", steps, "steps")
+			return steps // uncomment this, and you will see the repeating intervals
+		}
 	}
-	fmt.Println("Part 2:", steps)
+	return steps
 }
