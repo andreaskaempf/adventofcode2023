@@ -47,12 +47,17 @@ see https://adventofcode.com/2023
   from the hand, that yields the best poker hand type. Answer for both 
   parts is the sumproduct of the rank (sorted sequence) times a given bid.
 
-* **Day 8** (Go) Read a list of left/right instructions, and the left/right
+* **Day 8** (Go): Read a list of left/right instructions, and the left/right
   adjacencies for a set of nodes. For  Part 1, calculate the number of steps
   required to get from node "AAA" to "ZZZ". For Part 2, calculate the first
   step where all routes from ??A lead to any ??Z. Part 2 solution finds and
   takes into account the repeating length of each ??A to ??Z, but uses brute
   force to find the time when they align, not very efficient.
+
+* **Day 9** (Go): Given a list of numbers, repeatedly get the deltas between
+  each successive number. Then, use the delta to extrapolate back upwards to
+  the previous row. For Part 1, extrapolate at the end of each row, for Part 2,
+  before the beginning. Answers are the sums of the extrapolations.
 
 To compile and run a **Go** program
 * Change into the directory with the program
