@@ -69,7 +69,7 @@ func parseList(s string) []int {
 }
 
 // Maximum of a list (of ints, floats, or strings, using generics)
-func max[T int | float64 | string](l []T) T {
+func maxList[T int | float64 | string](l []T) T {
 	var y T
 	for i := 0; i < len(l); i++ {
 		if i == 0 || l[i] > y {
@@ -80,7 +80,7 @@ func max[T int | float64 | string](l []T) T {
 }
 
 // Minimum of a list (of ints, floats, or strings, using generics)
-func min[T int | float64 | string](l []T) T {
+func minList[T int | float64 | string](l []T) T {
 	var y T
 	for i := 0; i < len(l); i++ {
 		if i == 0 || l[i] < y {
