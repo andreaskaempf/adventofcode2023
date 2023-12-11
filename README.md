@@ -59,11 +59,17 @@ see https://adventofcode.com/2023
   the previous row. For Part 1, extrapolate at the end of each row, for Part 2,
   before the beginning. Answers are the sums of the extrapolations.
 
-* **Day 10** (Go) Given a 2D terrain of symbols, start at 'S' and follow the
+* **Day 10** (Go): Given a 2D terrain of symbols, start at 'S' and follow the
   chain of "pipe" shapes back to S. For Part 1, calculate the distance of the
   furthest-away shape, distance measured in either direction from start.  For
   Part 2, count up how many positions are *not* inside the shape (solved using
   ray tracing method).
+
+* **Day 11** (Go): Given a 2D terrain of symbols, start at 'S' and follow the
+  Given a 2D field of 'galaxies' surrounded by space, first 'expand' this by
+  doubling each row/column that is empty, and add up the manhattan distance
+  between every pair. For Part 2, expand by factor of a million instead of
+  doubling.
 
 To compile and run a **Go** program
 * Change into the directory with the program

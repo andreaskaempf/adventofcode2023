@@ -9,6 +9,8 @@ package main
 import (
 	"fmt"
 	//"strings"
+	//"bytes"
+	//"io/ioutil"
 )
 
 func main() {
@@ -19,4 +21,7 @@ func main() {
 	for _, l := range readLines(fname) {
 		fmt.Println(l)
 	}
+
+	//data, _ := ioutil.ReadFile(fname)
+	//lines = bytes.Split(data, []byte("\n"))
 }
