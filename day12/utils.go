@@ -37,16 +37,18 @@ func in[T int | float64 | byte | string](c T, s []T) bool {
 	return false
 }
 
-// Shallow compare two lists element-by-element, and report
-// if they are the same
-func same[T comparable](a, b []T) bool {
-	if len(a) != len(b) {
-		return false
+// Sum of a list
+func sum[T int | float64](l []T) T {
+	var y T
+	for i := 0; i < len(l); i++ {
+		y += l[i]
 	}
-	for i := 0; i < len(a); i++ {
-		if a[i] != b[i] {
-			return false
-		}
-	}
-	return true
+	return y
+}
+
+// Make copy of a string of bytes
+func makeCopy(s []byte) []byte {
+	c := make([]byte, len(s), len(s))
+	copy(c, s)
+	return c
 }

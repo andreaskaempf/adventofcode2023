@@ -170,3 +170,19 @@ func assert(cond bool, msg string) {
 		panic(msg)
 	}
 }
+
+// Sum up a list of ints
+func sum(l []int) int {
+	s := 0
+	for i := 0; i < len(l); i++ {
+		s += l[i]
+	}
+	return s
+}
+
+// Make copy of a string of bytes
+func makeCopy(s []byte) []byte {
+	c := make([]byte, len(s), len(s))
+	copy(c, s)
+	return c
+}

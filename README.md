@@ -71,6 +71,13 @@ see https://adventofcode.com/2023
   between every pair. For Part 2, expand by factor of a million instead of
   doubling.
 
+* **Day 12** (Go): Given a pattern of '#', '.', and '?' symbols, and a list of
+  numbers representing the lengths of blocks of '#', find the number of
+  possible replacements of '?' with either '.' or '#', so that the lengths of
+  the '#' sequences match the given list of numbers. For Part 2, the pattern is
+  repeated five times, with '?' in between, and the list of numbers is also
+  repeated five times, defeating a brute force solution.
+
 To compile and run a **Go** program
 * Change into the directory with the program
 * `go mod init day01`  (*only if go.mod does not yet exist*)
