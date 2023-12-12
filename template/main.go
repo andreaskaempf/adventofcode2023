@@ -1,27 +1,28 @@
-// Advent of Code 2023, Day 01
+// Advent of Code 2023, Day 10
 //
-// Description:
 //
-// AK, 1 Dec 2023
+//
+// AK, 10 Dec 2023
 
 package main
 
 import (
 	"fmt"
 	//"strings"
-	//"bytes"
-	//"io/ioutil"
+	"bytes"
+	"io/ioutil"
 )
 
 func main() {
 
-	// Read the input file
+	// Read the input file into a list of byte vectors
 	fname := "sample.txt"
 	//fname = "input.txt"
-	for _, l := range readLines(fname) {
-		fmt.Println(l)
+	// lines := readLines(fname)  // for strings
+	data, _ := ioutil.ReadFile(fname)
+	lines := bytes.Split(data, []byte("\n"))
+	for _, l := range lines {
+		fmt.Println(string(l))
 	}
 
-	//data, _ := ioutil.ReadFile(fname)
-	//lines = bytes.Split(data, []byte("\n"))
 }
