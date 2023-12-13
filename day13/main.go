@@ -1,23 +1,32 @@
-// Advent of Code 2023, Day 10
+// Advent of Code 2023, Day 13
 //
+// Given a set of 2D fields consisting of '.' and '#' characters, find
+// the row or column in each that gives a mirror reflection, i.e., left/right
+// sides are mirror images, or top/bottom sides. For Part 2, flip every
+// character on each field, to find a different reflection (ignoring the
+// previous one).
 //
-//
-// AK, 10 Dec 2023 (part 1 1:20)
+// AK, 13 Dec 2023
 
 package main
 
 import (
-	"fmt"
-	//"strings"
 	"bytes"
+	"fmt"
 	"io/ioutil"
 )
+
+// Global variables with last vertical and horiz split, and flag
+//
+//	to ignore the last horiz or vertical split (for part 2)
+var lastV, lastH int     // default zero
+var ignoreLastSplit bool // default false
 
 func main() {
 
 	// Read the input file into a list of byte vectors
 	fname := "sample.txt"
-	//fname = "input.txt"
+	fname = "input.txt"
 	data, _ := ioutil.ReadFile(fname)
 	lines := bytes.Split(data, []byte("\n"))
 
@@ -26,7 +35,7 @@ func main() {
 	var b [][]byte // the current block
 	for _, l := range lines {
 		if len(l) == 0 { // blank line means end of a block
-			ans1 += processBlock(b)
+			ans1 += processBlock2(b)
 			ans2 += part2(b)
 			b = [][]byte{}
 		} else {
@@ -34,99 +43,137 @@ func main() {
 		}
 	}
 	if len(b) > 0 { // process the last block
-		ans1 += processBlock(b)
+		ans1 += processBlock2(b)
 		ans2 += part2(b)
 	}
+
+	// Show the answers
 	fmt.Println("Part 1:", ans1) // 405 for sample, 35360 for input
-	fmt.Println("Part 2:", ans2) // 400 for sample, ? for input
-
+	fmt.Println("Part 2:", ans2) // 400 for sample, 36755 for input
 }
 
-// Find the line of symmetry in a block, return the number of columns to left
-// if vertical, or 100 X the number of rows above if horizontal
-func processBlock(b [][]byte) int {
-
-	//printBlock(b)
-
-	// Look for vertical line, must go all the way to the edge
-	var vc, nv int
-	for c := 0; c < len(b[0])-1; c++ {
-		found := true
-		for d := 0; d < len(b[0]); d++ {
-			if c-d < 0 || c+d+1 >= len(b[0]) {
-				break
-			}
-			if !same(getCol(c-d, b), getCol(c+d+1, b)) {
-				found = false
-				break
-			}
-		}
-		if found {
-			nv++
-			//fmt.Println(nv, "Vertical @ c =", c)
-			if c+1 > vc {
-				vc = c + 1
-			}
-		}
-	}
-
-	// Look for horizontal line
-	var hr, nh int
-	for r := 0; r < len(b)-1; r++ {
-		found := true
-		for d := 0; d < len(b); d++ {
-			if r-d < 0 || r+d+1 >= len(b) {
-				break
-			}
-			if !same(b[r-d], b[r+d+1]) {
-				found = false
-				break
-			}
-		}
-		if found {
-			nh++
-			//fmt.Println(nh, "Horizontal @ r =", r)
-			if r+1 > hr {
-				hr = r + 1
-			}
-		}
-	}
-
-	if hr == 0 && vc == 0 {
-		fmt.Println("*** No line(s) found:")
-		printBlock(b)
-	}
-	if hr > 0 && vc > 0 {
-		fmt.Println("*** Both horiz and vertical found:")
-		printBlock(b)
-	}
-	return vc + 100*hr
-}
-
-// For part 2, alter characters to try to find another line
+// For Part 2, alter each character on the shape, and find a different
+// mirror line
 func part2(b [][]byte) int {
 
-	// The initial score
-	s0 := processBlock(b)
+	// Get the initial score, so that we can ignore this split when finding
+	// the one with the character flipped
+	ignoreLastSplit = false
+	processBlock2(b)
+	lv := lastV
+	lh := lastH
+	ignoreLastSplit = true
 
-	// Try altering characters until you get a different non-zero score
+	// Try altering each character until you get a different vertical
+	// or horizontal split
 	for r := 0; r < len(b); r++ {
 		for c := 0; c < len(b[0]); c++ {
-			old := b[r][c]
-			if old == '.' {
+
+			// Flip this character between '.' and '#'
+			old := b[r][c]  // so we can set it back
+			if old == '.' { // alternate the character
 				b[r][c] = '#'
 			} else {
 				b[r][c] = '.'
 			}
-			s1 := processBlock(b)
-			if s1 > 0 && s1 != s0 {
+			lastV = lv             // set the vertical or horizontal split position
+			lastH = lh             // of the original split
+			s1 := processBlock2(b) // find the new split
+			b[r][c] = old          //set the flipped character back to what it was
+			if s1 > 0 {            // found it
 				return s1
 			}
-			b[r][c] = old
 		}
 	}
+
+	// Should never happen
 	fmt.Println("No answer found")
 	return 0
+}
+
+// Find horizontal or vertical line of symmetry in the shape, and return
+// the number of columns to left of it (if vertical) or 100 times the
+// number of rows above it (if horizontal)
+func processBlock2(b [][]byte) int {
+
+	// Look at each col
+	for c := 1; c <= len(b[0])-1; c++ {
+		if ignoreLastSplit && c == lastV {
+			continue
+		}
+		if isMirror(b, c) {
+			lastV = c // remember position so we can ignore it in part 2
+			lastH = -1
+			return c
+		}
+	}
+
+	// Transpose and do the same, to do all cols
+	b = transpose(b)
+	for c := 1; c <= len(b[0])-1; c++ {
+		if ignoreLastSplit && c == lastH {
+			continue
+		}
+		if isMirror(b, c) {
+			lastV = -1
+			lastH = c
+			return c * 100
+		}
+	}
+
+	// No mirror line found
+	return 0
+}
+
+// Given a list of rows, and a column number, are the left
+// and right sides of the rows mirror images?
+func isMirror(b [][]byte, c int) bool {
+
+	// Should never happen
+	if len(b[0]) < 2 {
+		fmt.Println("Too narrow")
+		return false
+	}
+
+	// Check every row
+	for r := 0; r < len(b); r++ {
+
+		// Get left and right sides of the row around c, so c = 1
+		// means the left side will be 1 char wide
+		row := b[r]
+		L := row[:c]
+		R := row[c:]
+		if len(L) == 0 || len(R) == 0 { // should never happen
+			fmt.Println("Empty side:", L, R)
+		}
+
+		// Reverse the left side, so they are left justified toward the split
+		L = reverse(L)
+
+		// Trim to same length
+		if len(L) > len(R) {
+			L = L[:len(R)]
+		} else if len(R) > len(L) {
+			R = R[:len(L)]
+		}
+
+		// If left and right are not the same, this is not a mirror line
+		if !same(L, R) {
+			return false
+		}
+	}
+
+	// If we get to here, it's a mirror line
+	return true
+}
+
+// Reverse a byte slice
+func reverse(b []byte) []byte {
+	r := make([]byte, len(b), len(b))
+	for i := 0; i < len(b); i++ {
+		r[i] = b[len(b)-i-1]
+	}
+	return r
 }
 
 // Get a column slice
@@ -138,14 +185,23 @@ func getCol(c int, b [][]byte) []byte {
 	return col
 }
 
-// Print a block
+// Transpose an array of arrays
+func transpose(b [][]byte) [][]byte {
+	t := make([][]byte, len(b[0]), len(b[0]))
+	for c := 0; c < len(b[0]); c++ {
+		t[c] = getCol(c, b)
+	}
+	return t
+}
+
+// Print a block, for debugging
 func printBlock(b [][]byte) {
 	for _, r := range b {
 		fmt.Println(string(r))
 	}
 }
 
-// Shallow compare two lists element-by-element, and report
+// Compare two lists element-by-element, and report
 // if they are the same
 func same[T comparable](a, b []T) bool {
 	if len(a) != len(b) {
