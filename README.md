@@ -78,6 +78,12 @@ see https://adventofcode.com/2023
   repeated five times, with '?' in between, and the list of numbers is also
   repeated five times, defeating a brute force solution.
 
+* **Day 13** (Go): Given a set of 2D fields consisting of '.' and '#'
+  characters, find the row or column in each that gives a mirror reflection,
+  i.e., left/right sides are mirror images, or top/bottom sides. For Part 2,
+  flip every character on each field, to find a different reflection
+  (ignoring the previous one).
+
 To compile and run a **Go** program
 * Change into the directory with the program
 * `go mod init day01`  (*only if go.mod does not yet exist*)
