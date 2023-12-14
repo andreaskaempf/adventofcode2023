@@ -1,8 +1,15 @@
 // Advent of Code 2023, Day 14
 //
+// Given a square field of 'O' (round rocks), '#' (square rocks) and '.',
+// move all the round rocks as much as possible to the top. For Part 2, do this
+// four times (once in each direction) to make a cycle, and simulate 10e9
+// cycles. For both parts, the answer is the score calculated as the sum of the
+// number of round rocks below in each column, for each row. Part 2 cannot
+// be calculated using brute force, but the pattern repeats after a while, so
+// use this to quickly determine what the pattern would look like after many
+// iterations.
 //
-//
-// AK, 14 Dec 2023 (Part 1: 30 mins)
+// AK, 14 Dec 2023
 
 package main
 
@@ -12,87 +19,94 @@ import (
 	"io/ioutil"
 )
 
+// Global variable with matrix of data
 var rows [][]byte
-
-// First occurrence of each pattern
 
 func main() {
 
 	// Read the input file into a list of byte vectors
 	fname := "sample.txt"
-	//fname = "input.txt"
+	fname = "input.txt"
 	data, _ := ioutil.ReadFile(fname)
 	rows = bytes.Split(data, []byte("\n"))
 
-	hist := map[string]int{}
+	// Set this to true for part 2
+	var part2 bool
+	part2 = true
+
 	// Part 1: roll up once, calculate score
-	//rollUp()
-	//fmt.Println("Part 1:", score()) // 136 sample, 109098 input
+	if !part2 {
+		rollUp()
+		fmt.Println("Part 1:", score()) // 136 sample, 109098 input
+		return
+	}
 
-	// Part 2:
-	for i := 0; i < 1_000_000_000; i++ {
+	// Part 2: first detect start and length of recurring cycles
+	var hist []string
+	var scores []int
+	var cycleStart, cycleLen int
+	var cycleFirst string
+	for i := 0; cycleLen == 0; i++ {
 
+		// Do the next cycle
+		doCycle()
+
+		// If this configuration has been encountered before,
+		// detect start and length of cycle
 		sb := toString(rows)
-		v, ok := hist[sb]
-		if ok {
-			fmt.Println("Cycle", i, "happened at", v)
-		} else {
-			hist[sb] = i
+		if in(sb, hist) {
+			if cycleStart == 0 { // beginning of cycle
+				cycleStart = i
+				cycleFirst = sb
+			} else if sb == cycleFirst { // past end of first cycle
+				cycleLen = i - cycleStart
+			}
 		}
 
-		//fmt.Println("Cycle", i+1)
-		doCycle()
-		//printBlock(rows)
+		// Add block and its score to history
+		hist = append(hist, sb)
+		scores = append(scores, score())
 	}
-	fmt.Println("Part 2:", score()) // 136 sample, 109098 input
+
+	// sample: 10, 7   input: 98, 17
+	fmt.Println("Cycle starts at", cycleStart, ", length", cycleLen)
+
+	// Use this to get the state after 1_000_000_000 cycles, and
+	// the score for that state
+	i := (1_000_000_000 - cycleStart - 1) % cycleLen
+	ans := scores[cycleStart+i]
+	fmt.Println("Part 2 (s/b 64, 100064):", ans) // 64 sample, 100064 input
 }
 
 // Create a string representation of the block
 func toString(b [][]byte) string {
 	s := ""
 	for r := 0; r < len(b); r++ {
+		if r > 0 {
+			s += " "
+		}
 		s += string(b[r])
 	}
 	return s
 }
 
-// Each cycle tilts the platform four times so that the rounded rocks roll north,
-// then west, then south, then east.
-func doCycle() bool {
-
-	moved := false
-
-	// Roll north
-	if rollUp() {
-		moved = true
-	}
-
-	// Roll west (left)
+// Each cycle tilts the platform four times so that the rounded rocks
+// roll north, then west, then south, then east. So roll up four times,
+// rotating each time.
+func doCycle() {
+	rollUp() // Roll north
 	rows = rotate(rows)
-	if rollUp() {
-		moved = true
-	}
-	// Roll south (down)
+	rollUp() // Roll west (left)
 	rows = rotate(rows)
-	if rollUp() { // roll west
-		moved = true
-	}
-
-	// Roll east (right)
+	rollUp() // Roll south (down)
 	rows = rotate(rows)
-	if rollUp() {
-		moved = true
-	}
-
-	// Restore direction, return if anything was moved
+	rollUp() // Roll east (right)
 	rows = rotate(rows)
-	return moved
 }
 
 // Roll all stones vertically up, return true if anything was moved
-func rollUp() bool {
+func rollUp() {
 	nc := len(rows[0])
-	moved := false
 	for r := 1; r < len(rows); r++ { // Start with top row, move down
 		for c := 0; c < nc; c++ { // Each column
 			if rows[r][c] == 'O' { // If it's an 'O', try to move it
@@ -100,7 +114,6 @@ func rollUp() bool {
 					if rows[y-1][c] == '.' {
 						rows[y-1][c] = 'O'
 						rows[y][c] = '.'
-						moved = true
 					} else {
 						break
 					}
@@ -108,7 +121,6 @@ func rollUp() bool {
 			}
 		}
 	}
-	return moved
 }
 
 // Calculate score
@@ -125,7 +137,7 @@ func score() int {
 	return ans
 }
 
-// Rotate a matrix in-place 90 degrees right
+// Rotate a matrix 90 degrees right
 func rotate(bb [][]byte) [][]byte {
 
 	// Transpose
@@ -136,22 +148,4 @@ func rotate(bb [][]byte) [][]byte {
 		bb[r] = reverse(bb[r])
 	}
 	return bb
-}
-
-func testRotate() {
-
-	bb := [][]byte{[]byte("1..2"), []byte("...."), []byte("3..4")}
-	printBlock(bb)
-
-	// Rotate once
-	bb = rotate(bb)
-	fmt.Println("Rotated:")
-	printBlock(bb)
-
-	// Rotate three more times
-	bb = rotate(bb)
-	bb = rotate(bb)
-	bb = rotate(bb)
-	fmt.Println("Three more times:")
-	printBlock(bb)
 }

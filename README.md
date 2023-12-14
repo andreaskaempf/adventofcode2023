@@ -84,6 +84,14 @@ see https://adventofcode.com/2023
   flip every character on each field, to find a different reflection
   (ignoring the previous one).
 
+* **Day 14** (Go): Given a square field of 'O' (round rocks), '#' (square rocks)
+  and '.', move all the round rocks as much as possible to the top. For Part 2,
+  do this four times (once in each direction) to make a cycle, and do 10e9
+  cycles. For both, answer is the score calculated as the sum of the number of
+  round rocks below in each column, for each row. Part 2 cannot be calculated
+  using brute force, but the pattern repeats after a while, so use this to
+  quickly determine what the pattern would look like after many iterations.
+
 To compile and run a **Go** program
 * Change into the directory with the program
 * `go mod init day01`  (*only if go.mod does not yet exist*)

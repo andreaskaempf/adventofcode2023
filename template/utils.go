@@ -204,3 +204,16 @@ func transpose(b [][]byte) [][]byte {
 	}
 	return t
 }
+
+// Rotate a matrix 90 degrees right
+func rotate(bb [][]byte) [][]byte {
+
+	// Transpose
+	bb = transpose(bb)
+
+	// Reverse each row
+	for r := 0; r < len(bb); r++ {
+		bb[r] = reverse(bb[r])
+	}
+	return bb
+}
