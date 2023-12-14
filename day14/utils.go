@@ -204,3 +204,10 @@ func transpose(b [][]byte) [][]byte {
 	}
 	return t
 }
+
+// Print a block, for debugging
+func printBlock(b [][]byte) {
+	for _, r := range b {
+		fmt.Println(string(r))
+	}
+}
