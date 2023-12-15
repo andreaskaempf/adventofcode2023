@@ -92,6 +92,10 @@ see https://adventofcode.com/2023
   using brute force, but the pattern repeats after a while, so use this to
   quickly determine what the pattern would look like after many iterations.
 
+* **Day 15** (Go): For Part 1, sum up the hashes of a list of commands, using a
+  custom has function. For Part 2, simulate the movement of "lenses" among a
+  chain of 256 boxes, by executing the commands.
+
 To compile and run a **Go** program
 * Change into the directory with the program
 * `go mod init day01`  (*only if go.mod does not yet exist*)
