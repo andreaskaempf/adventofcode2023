@@ -96,6 +96,16 @@ see https://adventofcode.com/2023
   custom has function. For Part 2, simulate the movement of "lenses" among a
   chain of 256 boxes, by executing the commands.
 
+* **Day 16** (Go): Given square a field of characters, simulate the movement of
+  a "beam of light" entering the field. Slashes and backslashes change the
+  direction of travel 90 degrees, and dashes or vertical bars "split" the beam
+  in two. "Energy" is defined as the number of cells in the field that are
+  eventually  touched by the beam. For Part 1, simulate a single beam entering
+  top left, and report the energy. For Part 2, try entering from every position
+  on every edge, and report the highest energy found.  Quite easy, but need to
+  know when to stop, ignore beams that leave the field and avoid creating
+  duplicates of beams that are identical to any that already exist.
+
 To compile and run a **Go** program
 * Change into the directory with the program
 * `go mod init day01`  (*only if go.mod does not yet exist*)
