@@ -33,39 +33,42 @@ func main() {
 	lines = readLines(fname)
 
 	// Part 1: Add up the number of points coloured
-	ans := part1()
-	fmt.Println("\nPart 1 (62, 95356):", ans) // 62, 95356
-
-	//ans = part2()
-	//fmt.Println("\nPart 2:", ans) //
-
-	// Test geom package
-	/*coords := []geom.Coord{}
-	coords = append(coords, geom.Coord{0, 0}) //, {10, 0}, {10, 10}, {0, 10}, {0, 0}}
-	sq := geom.NewPolygon(geom.XY).MustSetCoords([][]geom.Coord{
-		{{0, 0}, {10, 0}, {10, 10}, {0, 10}, {0, 0}},
-	})
-
-	fmt.Println("Area() =", sq.Area())*/
-	area(false)
+	//ans := part1()
+	fmt.Println("Part 1 (62, 95356):", area(false))   // 62, 95356
+	fmt.Println("Part 2 (952408144115):", area(true)) // 952408144115
 }
 
-// Get area of polygon outlined by instructions
+// Get area of polygon outlined by instructions, using the Go-Geom library
 func area(part2 bool) int64 {
 
-	// Collect the points that make up the polygon
-	var x, y int // start at 0,0
+	// Collect the corner points that make up the polygon
+	var x, y float64     // start at 0,0
+	var boundary float64 // length of the border
 	coords := []geom.Coord{}
 	coords = append(coords, geom.Coord{0, 0})
+	directions := []string{"R", "D", "L", "U"} // for Part 2
 	for _, l := range lines {
 
-		// Parse line
+		// Parse line, e.g., R 6 (#70c710)
+		// For Part 1, direction and number are given (ignore colour).
+		// For Part 2, the first five hex digits of the colour encode the
+		// distance, last hex digit encodes the direction so that
+		// 0 means R, 1 means D, 2 means L, and 3 means U.
 		parts := strings.Split(l, " ")
 		dir := parts[0] // direction R/L/D/U
-		n := atoi(parts[1])
-		//color := parts[2]  // not used for Part 1
+		n := atof(parts[1])
+		if part2 {
+			color := parts[2] // not used for Part 1
+			ns := color[2:7]
+			n64, err := strconv.ParseInt(ns, 16, 64)
+			if err != nil {
+				fmt.Println("Hex converstion:", err.Error())
+			}
+			n = float64(n64)
+			dir = directions[int(color[7]-'0')]
+		}
 
-		// Create a point for this step
+		// Add a coordinate for this step
 		if dir == "R" {
 			x += n
 		} else if dir == "L" {
@@ -75,7 +78,11 @@ func area(part2 bool) int64 {
 		} else {
 			y += n
 		}
-		coords = append(coords, geom.Coord{float64(x), float64(y)})
+		coords = append(coords, geom.Coord{x, y})
+
+		// Measure the length of the boundary around the shape, so we can
+		// add 1/2 width padding to get the area including the outline
+		boundary += n + .5
 	}
 
 	// Close the shape
@@ -84,8 +91,7 @@ func area(part2 bool) int64 {
 	// Calculate the area
 	sh := geom.NewPolygon(geom.XY).MustSetCoords([][]geom.Coord{coords})
 	a := sh.Area()
-	fmt.Println("Area() =", a)
-	return int64(a)
+	return int64(a + boundary/2 - 2)
 }
 
 // Part 1: interpret the instructions as direction, distance, color,
