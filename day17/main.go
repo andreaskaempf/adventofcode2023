@@ -42,6 +42,7 @@ func main() {
 
 	// Read the input file into a list of byte vectors
 	fname := "sample.txt"
+	//fname = "sample2.txt" // second example for part 2
 	fname = "input.txt"
 	data, _ := ioutil.ReadFile(fname)
 	rows = bytes.Split(data, []byte("\n"))
@@ -52,7 +53,8 @@ func main() {
 	// but takes 84 mins
 	//fmt.Println("Part 1 (Recursive):", attempt1())
 
-	fmt.Println("Part 1 (Djikstra):", solve()) // 102,
+	//fmt.Println("Part 1:", solve(false)) // 102, 724
+	fmt.Println("Part 2:", solve(true)) // 94,
 }
 
 // Modified Djistra algorithm, transcribed from my Julia solution to
@@ -61,7 +63,7 @@ func main() {
 // i.e., direction of travel and number of steps in that direction, as
 // well as position, and to allow for the problem constraint that you
 // can't move backwards or more than 3 steps in the same direction.
-func solve() int {
+func solve(part2 bool) int {
 
 	// All states initially unvisited
 	visited := make(map[State]bool) // initially all false
@@ -89,9 +91,19 @@ func solve() int {
 		// direction.
 		for dir := 0; dir < 4; dir++ {
 
-			// Skip if same direction as last time, and already 3 steps
-			if dir == s.direction && s.run == 3 {
+			// Part 1: skip this route if same direction as last time,
+			// and already 3 steps
+			if !part2 && dir == s.direction && s.run == 3 {
 				continue
+			}
+
+			// Part 2: maximum 10 steps in same direction, minimum 4 steps
+			if part2 {
+				if dir == s.direction && s.run >= 10 { // max 10 same dir
+					continue
+				} else if !(s.x == 0 && s.y == 0) && dir != s.direction && s.run < 4 { // min 4 blocks
+					continue // before changing direction
+				}
 			}
 
 			// Can't reverse
@@ -164,7 +176,7 @@ func solve() int {
 
 		// Stop when no more states (should not happen)
 		if lowestDist == INF {
-			fmt.Println("Ran out of nodes")
+			fmt.Println("No solution found")
 			break
 		}
 	}
