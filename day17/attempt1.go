@@ -20,6 +20,11 @@ var bestSoFar int
 var Memo map[Config]int
 */
 
+// A 2D point, required because we use x,y pair as map key
+type Point struct {
+	x, y int
+}
+
 // First attempt: recursive depth-first search with pruning, but no memoization
 func attempt1() int {
 

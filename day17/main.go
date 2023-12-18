@@ -1,6 +1,8 @@
 // Advent of Code 2023, Day 17
 //
-//
+// Given a matrix of digits, find the sum of the digits along the shortest
+// path from the top left to the bottom right, such that you never go in
+// the same direction more than 3 steps.
 //
 // AK, 17 Dec 2023
 
@@ -16,9 +18,15 @@ import (
 var rows [][]byte
 var nr, nc int
 
-// A 2D point, required because we use x,y pair as map key
-type Point struct {
-	x, y int
+const INF int = 1e6
+
+// State of a node, used as a key for distance & visited maps, defined by
+// direction and number of steps already take in that direction, as well as
+// position
+type State struct {
+	x, y      int // position
+	direction int // direction we were in when we got here
+	run       int // number of steps already in the same direction
 }
 
 // The four directions, in the directions that are mostly likely to take
@@ -34,160 +42,139 @@ func main() {
 
 	// Read the input file into a list of byte vectors
 	fname := "sample.txt"
-	//fname = "input.txt"
+	fname = "input.txt"
 	data, _ := ioutil.ReadFile(fname)
 	rows = bytes.Split(data, []byte("\n"))
 	nr = len(rows)
 	nc = len(rows[0])
-	// fmt.Println("Part 1 (Recursive):", attempt1())
-	fmt.Println("Part 1 (Djikstra):", solve()) // 102,
-	// 1641 too high, 1640 wrong, 724
-}
 
-const PENALTY int = 1e6
+	// Recursive solution correctly give 102 for the sample input,
+	// but takes 84 mins
+	//fmt.Println("Part 1 (Recursive):", attempt1())
+
+	fmt.Println("Part 1 (Djikstra):", solve()) // 102,
+}
 
 // Modified Djistra algorithm, transcribed from my Julia solution to
 // AoC 2021, Day 15. Finds the lowest total cost path from top left to
-// bottom right of a matrix. Modified for the problem constraint that you
+// bottom right of a matrix. Modified to keep track of path for state,
+// i.e., direction of travel and number of steps in that direction, as
+// well as position, and to allow for the problem constraint that you
 // can't move more than 3 steps in the same direction.
 func solve() int {
 
-	// Mark all nodes as unvisited
-	visited := make(map[Point]bool) // default false
-	var path []Point
+	// All states initially unvisited
+	visited := make(map[State]bool) // initially all false
 
-	// Assign to every node a tentative distance value: zero for
-	// initial node and infinity for all other nodes
-	dist := make(map[Point]int)
-	for y := 0; y < nr; y++ {
-		for x := 0; x < nc; x++ {
-			p := Point{x, y}
-			dist[p] = PENALTY
+	// Distance for every state, assumed to be infinity if missing
+	dist := make(map[State]int)
+
+	// The initial state: top left corner, no initial direction or streak
+	s := State{0, 0, -1, 0}
+	dist[s] = 0
+
+	// Start algorithm, stops when we reach the bottom, or no more states to explore
+	var maxDist int
+	for {
+
+		// Report progress
+		if dist[s] > maxDist {
+			maxDist = dist[s]
+			fmt.Println(s.x, s.y, maxDist)
 		}
-	}
 
-	// The current point, starts at top left, dist zero
-	p := Point{0, 0}
-	dist[p] = 0
-
-	// Start algorithm iterations, stop when reach bottom right
-	for !(p.y == nr-1 && p.x == nc-1) {
-
-		// Add this point to the optimal path
-		path = append(path, p)
-
-		// Consider unvisited neighbors in each direction
+		// Consider all unvisited neighbors one step away from the current
+		// state.  This is not just x,y proximity, but takes into account the
+		// current direction and the number of movements already in that
+		// direction.
 		for dir := 0; dir < 4; dir++ {
 
-			// Get the next location, based on direction
-			p1 := p
+			// Skip if same direction as last time, and already 3 steps
+			if dir == s.direction && s.run == 3 {
+				continue
+			}
+
+			// Can't reverse
+			if (dir == up && s.direction == down) || (dir == down && s.direction == up) || (dir == left && s.direction == right) || (dir == right && s.direction == left) {
+				continue
+			}
+
+			// Get the next location one step away, based on direction
+			x := s.x
+			y := s.y
 			if dir == up {
-				p1.y--
+				y--
 			} else if dir == down {
-				p1.y++
+				y++
 			} else if dir == left {
-				p1.x--
-			} else if dir == right {
-				p1.x++
-			} else {
-				panic("Invalid direction")
+				x--
+			} else { // right
+				x++
 			}
 
-			// Can't go here if already visited or out of bounds
-			if visited[p1] || p1.x < 0 || p1.x >= nc || p1.y < 0 || p1.y >= nr {
+			// Can't go here if out of bounds
+			if x < 0 || x >= nc || y < 0 || y >= nr {
 				continue
 			}
 
-			// Can't go here if already 3 steps in this direction
-			if sameSteps(dir, 3, path) {
+			// Create new state for proposed movement, skip if already visited
+			run := 1                // 1 step if starting in new direction
+			if dir == s.direction { // if going in same direction,
+				run += s.run // add prev run
+			}
+			s1 := State{x, y, dir, run}
+
+			// Skip if already visited, so we never backtrack
+			if visited[s1] { // will be false if not in dictionary yet
 				continue
 			}
 
-			// Update cheapest cost of getting to this location
-			costHere := int(rows[p1.y][p1.x] - '0')
-			c1 := costHere + dist[p]
-			if c1 < dist[p1] {
-				dist[p1] = c1
-			}
+			// Get cost of getting to this location is cost of getting to
+			// previous location, plus the cost of this one
+			c1 := dist[s] + int(rows[y][x]-'0')
 
+			// Update cost for the new node if lower than previous
+			_, ok := dist[s1]
+			if !ok || c1 < dist[s1] {
+				dist[s1] = c1
+			}
 		}
 
-		// Mark this node as visited
-		visited[p] = true
+		// Mark this state as visited, so we don't return to it
+		visited[s] = true
 
-		// Next point will be the one that has minimum value in the matrix,
+		// Find the next state to explore, the one with the lowest cost in the matrix,
 		// ignoring cells already visited
-		var lowestDist int = PENALTY
-		for x := 0; x < nc; x++ {
-			for y := 0; y < nr; y++ {
-				p1 := Point{x, y}
-				d := dist[p1]
-				if d < lowestDist && d < PENALTY && !visited[p1] {
-					p = p1
-				}
+		var lowestDist int = INF
+		for s1 := range dist {
+			d, _ := dist[s1]
+			if d < lowestDist && !visited[s1] {
+				lowestDist = d
+				s = s1 // the next state to be explored
 			}
 		}
 
-	}
-
-	//Return solution, cost in the bottom right corner
-	last := Point{nc - 1, nr - 1}
-	return dist[last]
-
-}
-
-// Determine if n steps have been taken in the same direction
-func sameSteps(checkDir, n int, path []Point) bool {
-
-	// Obviously false if path too short
-	if len(path) < n+1 {
-		return false
-	}
-
-	// Only care about the last three steps
-	if len(path) > n+1 {
-		path = path[len(path)-n-1:]
-		assert(len(path) == n+1, "Bad path slice")
-	}
-
-	// Check each direction, return false if not same as checking
-	dirs := []int{}
-	for i := 1; i < len(path); i++ {
-		p0 := path[i-1]
-		p1 := path[i]
-		var dir1 int
-		if p1.x > p0.x {
-			dir1 = right
-		} else if p1.x < p0.x {
-			dir1 = left
-		} else if p1.y > p0.y {
-			dir1 = down
-		} else if p1.y < p0.y {
-			dir1 = up
-		} else {
-			fmt.Println(path)
-			panic("Invalid movement")
+		// If the selected state is the bottom, we are done, as it's the
+		// first and cheapest route to the bottom
+		if s.x == nc-1 && s.y == nr-1 {
+			fmt.Println("Solution found")
+			return dist[s]
 		}
-		dirs = append(dirs, dir1)
-	}
-	assert(len(dirs) == n, "Bad dirs len")
-	//fmt.Println(path, dirs)
 
-	// Check each direction
-	for _, d := range dirs {
-		if d != checkDir {
-			return false
+		// Stop when no more states (should not happen)
+		if lowestDist == INF {
+			fmt.Println("Ran out of nodes")
+			break
 		}
 	}
 
-	// If we get to here, the last three directions are the same as the
-	// one being checked
-	return true
-}
-
-// Panic if a test condition is not true
-func assert(cond bool, msg string) {
-	if !cond {
-		panic(msg)
-	}
+	// In case we didn't find it above, solution is the lowest cost route
+	// to the bottom right corner
+	/*ans := INF
+	for s, c := range dist {
+		if s.x == nc-1 && s.y == nr-1 && c < ans {
+			ans = c
+		}
+	}*/
+	return INF
 }
