@@ -1,6 +1,9 @@
 // Advent of Code 2023, Day 18
 //
-//
+// Given a set of instructions to draw a polygon consisting of just
+// horizontal and vertical lines, count the number of points that are
+// inside the polygon. For Part 2, instructions are revised to give a
+// much bigger shape, that cannot be computed in memory.
 //
 // AK, 18 Dec 2023
 
@@ -11,6 +14,8 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/twpayne/go-geom"
 )
 
 type Point struct {
@@ -31,9 +36,56 @@ func main() {
 	ans := part1()
 	fmt.Println("\nPart 1 (62, 95356):", ans) // 62, 95356
 
-	ans = part2()
-	fmt.Println("\nPart 2:", ans) //
+	//ans = part2()
+	//fmt.Println("\nPart 2:", ans) //
 
+	// Test geom package
+	/*coords := []geom.Coord{}
+	coords = append(coords, geom.Coord{0, 0}) //, {10, 0}, {10, 10}, {0, 10}, {0, 0}}
+	sq := geom.NewPolygon(geom.XY).MustSetCoords([][]geom.Coord{
+		{{0, 0}, {10, 0}, {10, 10}, {0, 10}, {0, 0}},
+	})
+
+	fmt.Println("Area() =", sq.Area())*/
+	area(false)
+}
+
+// Get area of polygon outlined by instructions
+func area(part2 bool) int64 {
+
+	// Collect the points that make up the polygon
+	var x, y int // start at 0,0
+	coords := []geom.Coord{}
+	coords = append(coords, geom.Coord{0, 0})
+	for _, l := range lines {
+
+		// Parse line
+		parts := strings.Split(l, " ")
+		dir := parts[0] // direction R/L/D/U
+		n := atoi(parts[1])
+		//color := parts[2]  // not used for Part 1
+
+		// Create a point for this step
+		if dir == "R" {
+			x += n
+		} else if dir == "L" {
+			x -= n
+		} else if dir == "U" {
+			y -= n
+		} else {
+			y += n
+		}
+		coords = append(coords, geom.Coord{float64(x), float64(y)})
+	}
+
+	// Close the shape
+	coords = append(coords, geom.Coord{0, 0})
+
+	// Calculate the area
+	sh := geom.NewPolygon(geom.XY).MustSetCoords([][]geom.Coord{coords})
+	a := sh.Area()
+	fmt.Println("Area() =", a)
+	return int64(a)
 }
 
 // Part 1: interpret the instructions as direction, distance, color,
@@ -65,15 +117,16 @@ func part1() int64 {
 			points[p] = 1
 		}
 	}
-	//draw()
-	// Fill the shape
-	//fill(4, 2) // used fill() for Part 1
 
-	// Return the number of points filled
-	//return len(points)
-	ans := fill4()
+	// Fill the shape, using the simple recursive algorithm
+	fill1(4, 2)
+	ans := len(points)
+	fmt.Println("Using recursive algorith:", ans)
+
+	//ans := fill4()
 	//draw()
-	return ans // fill3()
+	//return ans // fill3()
+	return 0
 }
 
 // Part 2: interpret the instructions from just the color,
@@ -219,22 +272,22 @@ func draw() {
 	}
 }
 
-// Flood-fill the shape, starting with the given position, which must
-// be inside shape (otherwise program will crash, so you know to try
-// a different value)
+// Simple recursive algorithm to flood-fill the shape, starting with the
+// given position, which must be inside shape (otherwise program will crash,
+// so you know to try a different value).
 // Works for part 1, but too memory intensive for part 2
-func _fill(x, y int) {
+func fill1(x, y int) {
 	points[Point{x, y}] = 1 // fill current point
 	if empty(x-1, y) {
-		_fill(x-1, y)
+		fill1(x-1, y)
 	}
 	if empty(x+1, y) {
-		_fill(x+1, y)
+		fill1(x+1, y)
 	}
 	if empty(x, y-1) {
-		_fill(x, y-1)
+		fill1(x, y-1)
 	}
 	if empty(x, y+1) {
-		_fill(x, y+1)
+		fill1(x, y+1)
 	}
 }
