@@ -60,7 +60,7 @@ func main() {
 // bottom right of a matrix. Modified to keep track of path for state,
 // i.e., direction of travel and number of steps in that direction, as
 // well as position, and to allow for the problem constraint that you
-// can't move more than 3 steps in the same direction.
+// can't move backwards or more than 3 steps in the same direction.
 func solve() int {
 
 	// All states initially unvisited
@@ -71,7 +71,7 @@ func solve() int {
 
 	// The initial state: top left corner, no initial direction or streak
 	s := State{0, 0, -1, 0}
-	dist[s] = 0
+	dist[s] = 0 // only the start node has a distance, all others infinity
 
 	// Start algorithm, stops when we reach the bottom, or no more states to explore
 	var maxDist int
@@ -143,8 +143,9 @@ func solve() int {
 		// Mark this state as visited, so we don't return to it
 		visited[s] = true
 
-		// Find the next state to explore, the one with the lowest cost in the matrix,
-		// ignoring cells already visited
+		// Find the next state to explore, the one with the lowest cost in the
+		// matrix, ignoring cells already visited; this emulates the
+		// functionality of a priority queue
 		var lowestDist int = INF
 		for s1 := range dist {
 			d, _ := dist[s1]
@@ -168,13 +169,6 @@ func solve() int {
 		}
 	}
 
-	// In case we didn't find it above, solution is the lowest cost route
-	// to the bottom right corner
-	/*ans := INF
-	for s, c := range dist {
-		if s.x == nc-1 && s.y == nr-1 && c < ans {
-			ans = c
-		}
-	}*/
+	// No solution found
 	return INF
 }
