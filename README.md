@@ -106,6 +106,14 @@ see https://adventofcode.com/2023
   know when to stop, ignore beams that leave the field and avoid creating
   duplicates of beams that are identical to any that already exist.
 
+* **Day 17** (Go): Given a matrix of digits, find the sum of the digits along
+  the shortest path from the top left to the bottom right, such that you
+  never go in the same direction more than 3 steps. For Part 2, maximum 10
+  steps in the same direction, minimum 4 steps before changing direction.
+  Solved by modifying the Djistra algorithm, transcribed from my Julia
+  solution to AoC 2021, Day 15, to enforce constraints on direction and
+  number of steps in the same direction.
+
 To compile and run a **Go** program
 * Change into the directory with the program
 * `go mod init day01`  (*only if go.mod does not yet exist*)

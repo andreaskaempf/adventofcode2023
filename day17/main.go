@@ -2,9 +2,13 @@
 //
 // Given a matrix of digits, find the sum of the digits along the shortest
 // path from the top left to the bottom right, such that you never go in
-// the same direction more than 3 steps.
+// the same direction more than 3 steps. For Part 2, maximum 10 steps in
+// the same direction, minimum 4 steps before changing direction. Solved
+// by modifying the Djistra algorithm, transcribed from my Julia solution
+// to AoC 2021, Day 15, to enforce constraints on direction and number of
+// steps in the same direction.
 //
-// AK, 17 Dec 2023
+// AK, 17-18 Dec 2023
 
 package main
 
