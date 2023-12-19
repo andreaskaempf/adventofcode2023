@@ -1,7 +1,5 @@
 // Advent of Code 2023, Day 19
 //
-//
-//
 // AK, 19 Dec 2023
 
 package main
