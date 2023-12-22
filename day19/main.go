@@ -9,39 +9,53 @@ import (
 	"strings"
 )
 
-// Global list of parts, where each part is represented as a dictionary x/m/a/s -> value
+// Global list of parts, where each part is represented as a
+// dictionary x/m/a/s -> value
 type Part map[string]int
 
 var Parts []Part
 
-// Global dictionary of rules, stored in text
-var Rules map[string][]string
+// A test within a rule, e.g., "s<1351:dest"
+// Either a comparison witor a destination
+type Test struct {
+	a    string // attribute name, e.g., "s"
+	cmp  byte   // comparator, e.g., '<', '>' or 0 if destination
+	n    int    // number to compare against
+	dest string // destination if comparison is true
+}
+
+// Global dictionary of rules, each a list of sequential tests
+var Rules map[string][]Test
 
 func main() {
 
 	// Read the input file
-	//loadData("sample.txt")
-	loadData("input.txt")
+	loadData("sample.txt")
+	//loadData("input.txt")
 
-	// Process each part
+	// Part 1: Process each part, add up attributes of accepted parts
 	ans := 0
 	for _, p := range Parts {
 		if processPart(p) == "A" {
-			n := p["x"] + p["m"] + p["a"] + p["s"]
-			ans += n
+			ans += p["x"] + p["m"] + p["a"] + p["s"]
 		}
 	}
-	fmt.Println("Part 1:", ans)
+	fmt.Println("Part 1 (19114, 397643):", ans) // 19114, 397643
+
+	// Part 2: determine many parts, within a universe of 0..4000,
+	// would be accepted
+	part2()
 }
 
+// PART 1
+
+// For Part 1, process a part, return "A" if accepted, "R" if rejected
 func processPart(p Part) string {
 
-	fmt.Println("Checking part", p)
-
+	//fmt.Println("Checking part", p)
 	r := Rules["in"] // start with rule "in"
 	for {
 		nextRule := applyRule(r, p)
-		//fmt.Println(r, "=>", nextRule)
 		if nextRule == "A" || nextRule == "R" {
 			return nextRule
 		}
@@ -52,29 +66,23 @@ func processPart(p Part) string {
 
 // Apply one rule, return the target
 // E.g., qqz{s>2770:qs,m<1801:hdj,R}
-func applyRule(r []string, p Part) string {
+func applyRule(r []Test, p Part) string {
 
-	for _, test := range r {
+	for _, t := range r { // each test in the rule
 
 		// Expect "s<1351:dest" for comparison
 		// Otherwise it's a destination
-		if !in(':', []byte(test)) {
-			return test
+		if t.cmp == 0 {
+			return t.dest
 		}
 
 		// Evaluate "s<1351:dest"
-		lr := strings.Split(test, ":")
-		dest := lr[1]
-		a := lr[0][:1]  // attribute name, e.g., "s"
-		cmp := lr[0][1] // comparator, e.g., '<'
-		n := atoi(lr[0][2:])
-		val, ok := p[a]
-		//fmt.Println(a, string(cmp), n, val)
+		val, ok := p[t.a]
 		assert(ok, "Attribute not found")
-		if cmp == '<' && val < n {
-			return dest
-		} else if cmp == '>' && val > n {
-			return dest
+		if t.cmp == '<' && val < t.n {
+			return t.dest
+		} else if t.cmp == '>' && val > t.n {
+			return t.dest
 		}
 	}
 
@@ -82,12 +90,68 @@ func applyRule(r []string, p Part) string {
 	return "?"
 }
 
+// PART 2
+
+var Accepts, Rejects [][]Test
+
+// Part 2: determine how many parts could be accepted, out of
+// a universe where each parameter ranges from 0 to 4000.
+
+// Take a rule (series of tests).
+// First one: enumerate it, with zero-length "and" list of rules
+// Enumerate takes the first rule in list:
+// - if it's terminal (A or R), add it to the global list of terminals
+// - otherwise, enumerate that rule, with list of "and" rules
+// Subsequent rules:
+// - take the previous rule, negate it, add it to the "and" list
+// - enumerate that rule
+func part2() {
+
+	Accepts = [][]Test{}
+	Rejects = [][]Test{}
+
+	r := Rules["in"] // start with rule "in"
+	enumerate(r, []Test{})
+
+	fmt.Println("Accept:", Accepts)
+	fmt.Println("Reject:", Rejects)
+
+	/*for _, t := range r { // each test in the rule
+		enumerate(t, []Test{}) // enumerate all rules
+	}*/
+	//fmt.Println("Part 2:", r)
+
+}
+
+// Enumerate a rule, i.e., recursively build up lists of tests
+// that lead to "A" or "R"
+// Rule at front of list gets enumerated, along with all the
+func enumerate(tests []Test, prevCond []Test) {
+
+	//fmt.Println("Enumerating", r, prevCond)
+	// TODO: could be other terminal
+	if len(tests) == 1 && tests[0].cmp == 0 {
+		if tests[0].dest == "A" {
+			Accepts = append(Accepts, prevCond)
+		} else if tests[0].dest == "R" {
+			Rejects = append(Rejects, prevCond)
+		}
+		return
+	}
+
+	// Enumerate the first rule
+	prevCond = append(prevCond, tests[0])
+	enumerate(tests[1:], prevCond)
+}
+
+// LOAD DATA
+
 // Read and parse the input data, into global variables.
 // Rule: qqz{s>2770:qs,m<1801:hdj,R}
 // Part: {x=787,m=2655,a=1222,s=2876}
 func loadData(fname string) {
 
-	Rules = make(map[string][]string)
+	Rules = make(map[string][]Test)
 	var readingParts bool
 	for _, l := range readLines(fname) {
 
@@ -109,7 +173,11 @@ func loadData(fname string) {
 		} else {
 			l = l[:len(l)-1] // remove closing brace
 			ab := strings.Split(l, "{")
-			Rules[ab[0]] = strings.Split(ab[1], ",")
+			ruleName := ab[0]
+			Rules[ruleName] = []Test{}
+			for _, s := range strings.Split(ab[1], ",") {
+				Rules[ruleName] = append(Rules[ruleName], parseTest(s))
+			}
 		}
 	}
 	/*fmt.Println("Rules:")
@@ -120,4 +188,22 @@ func loadData(fname string) {
 	for _, p := range Parts {
 		fmt.Println(p)
 	}*/
+}
+
+// Parse a test, e.g., "s<1351:dest"
+func parseTest(test string) Test {
+
+	// Destination if no comparison
+	var t Test
+	if !in(':', []byte(test)) {
+		t.dest = test
+		return t
+	}
+	// Otherwise assign comparator and number
+	lr := strings.Split(test, ":")
+	t.a = lr[0][:1]  // attribute name, e.g., "s"
+	t.cmp = lr[0][1] // comparator, e.g., '<'
+	t.n = atoi(lr[0][2:])
+	t.dest = lr[1] // destination for this test
+	return t
 }
