@@ -1,5 +1,13 @@
 // Advent of Code 2023, Day 19
 //
+// Given a set of rules, and a set of parts, determine which parts
+// are accepted by the rules. Rules are a series of tests, each of
+// which is either a comparison or a destination. A comparison is
+// of the form "s<1351:dest", where "s" is an attribute, "<" is a
+// comparator, "1351" is a number, and "dest" is a destination.
+// For Part 2, determine how many parts, within a universe of 0..4000
+// for each of the four parameters, would be accepted (*to do*).
+//
 // AK, 19 Dec 2023
 
 package main

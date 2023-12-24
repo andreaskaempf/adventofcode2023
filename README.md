@@ -120,6 +120,14 @@ see https://adventofcode.com/2023
   much bigger shape, that cannot be computed in memory. Did Part 1 using
   simple recursive flood fill, Part 2 using go-geom library.
 
+* **Day 19**: (Go) Given a set of rules, and a set of parts, determine which
+  parts are accepted by the rules. Rules are a series of tests, each of which
+  is either a comparison or a destination. A comparison is of the form
+  "s<1351:dest", where "s" is an attribute, "<" is a comparator, "1351" is a
+  number, and "dest" is a destination.  For Part 2, determine how many parts,
+  within a universe of 0..4000 for each of the four parameters, would be
+  accepted (*to do*).
+
 * **Day 21** (Go) Given a map of points and rocks, find the number of points //
   that can be reached in n steps, starting from a given point. Used Djikstra's
   algorithm to find the shortest path to every point, and then count the number
