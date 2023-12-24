@@ -114,6 +114,11 @@ see https://adventofcode.com/2023
   solution to AoC 2021, Day 15, to enforce constraints on direction and
   number of steps in the same direction.
 
+* **Day 18** (Go): Given a set of instructions to draw a polygon consisting of
+  just horizontal and vertical lines, count the number of points that are
+  inside the polygon. For Part 2, instructions are revised to give a
+  much bigger shape, that cannot be computed in memory. Did Part 1 using
+  simple recursive flood fill, Part 2 using go-geom library.
 
 * **Day 21** (Go) Given a map of points and rocks, find the number of points //
   that can be reached in n steps, starting from a given point. Used Djikstra's
