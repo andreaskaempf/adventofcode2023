@@ -128,11 +128,21 @@ see https://adventofcode.com/2023
   within a universe of 0..4000 for each of the four parameters, would be
   accepted (*to do*).
 
-* **Day 21** (Go) Given a map of points and rocks, find the number of points //
+* **Day 20**: *To do*
+
+* **Day 21** (Go): Given a map of points and rocks, find the number of points //
   that can be reached in n steps, starting from a given point. Used Djikstra's
   algorithm to find the shortest path to every point, and then count the number
   of points that can be reached in n steps. For Part 2, assume a much larger
   number of steps, infeasible using brute force (*to do*).
+
+* **Day 22**: *To do*
+
+* **Day 23** (Go): Find the maximum number of steps (longest path) from top to
+  bottom of a grid, ignorning blocks (hash marks), and not revisiting previous
+  cells. In Part 1, pointer chars indicate that you must move in that direction
+  (restriction removed in Part 2). Hard problem, used brute force, but could
+  probably simplify the graph to reduce the search space.
 
 * **Day 24** (Go): Given a list of stones, each with a position and velocity,
   find the number stones whose trajectories will intersect. For Part 2, find
