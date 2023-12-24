@@ -20,8 +20,14 @@ func main() {
 	//fname = "input.txt"
 	// lines := readLines(fname)  // for strings
 	data, _ := ioutil.ReadFile(fname)
-	lines := bytes.Split(data, []byte("\n"))
-	for _, l := range lines {
+	rows := bytes.Split(data, []byte("\n"))
+
+	// Remove last row if empty
+	if len(rows[len(rows)-1]) == 0 {
+		rows = rows[:len(rows)-1]
+	}
+
+	for _, l := range rows {
 		fmt.Println(string(l))
 	}
 

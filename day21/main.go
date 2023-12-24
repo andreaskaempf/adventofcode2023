@@ -43,11 +43,12 @@ func main() {
 	fmt.Println("Start at", start)
 
 	// Part 1: number of squares that can be reached in n steps
-	fmt.Println("Part 1:", part1(start, 64)) // sample: 6 -> 16
+	// Sample: 6 -> 16, input: 64 -> 3578
+	fmt.Println("Part 1:", part1(start, 64))
 }
 
 // Part 1: use Djikstra to get number of steps from start
-// to any square, count up how many can be reached in n steps
+// to any square, count up how many can be reached in exactly n steps
 func part1(start Point, n int) int {
 
 	// Distance initially zero for start, undefined (infinity)
@@ -67,10 +68,12 @@ func part1(start Point, n int) int {
 			if p1.x >= 0 && p1.x < nc && p1.y >= 0 && p1.y < nr && !rocks[p1] {
 
 				// Set dist if lower than current value
-				_, ok := dist[p1] // is there already a distance for this point?
 				d1 := dist[p] + 1 // the distance to get here
-				if d1 < dist[p1] || !ok {
-					dist[p1] = d1 // Set the distance for this point if lower than previous
+				if d1 <= n {      // don't bother if too many steps
+					_, ok := dist[p1] // is there already a distance for this point?
+					if d1 < dist[p1] || !ok {
+						dist[p1] = d1 // Set the distance for this point if lower than previous
+					}
 				}
 			}
 		}

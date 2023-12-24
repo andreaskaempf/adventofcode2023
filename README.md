@@ -114,6 +114,12 @@ see https://adventofcode.com/2023
   solution to AoC 2021, Day 15, to enforce constraints on direction and
   number of steps in the same direction.
 
+* **Day 24** (Go): Given a list of stones, each with a position and velocity,
+  find the number stones whose trajectories will intersect. For Part 2, find
+  the position and velocity of a new stone, whose trajectory will intersect
+  with that of every other stone (*incomplete*).
+
+
 To compile and run a **Go** program
 * Change into the directory with the program
 * `go mod init day01`  (*only if go.mod does not yet exist*)
