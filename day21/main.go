@@ -1,5 +1,12 @@
 // Advent of Code 2023, Day 21
 //
+// Given a map of points and rocks, find the number of points
+// that can be reached in n steps, starting from a given point.
+// Used Djikstra's algorithm to find the shortest path to every
+// point, and then count the number of points that can be reached
+// in n steps. For Part 2, assume a much larger number of steps,
+// infeasible using brute force (to do).
+//
 // AK, 22 Dec 2023
 
 package main

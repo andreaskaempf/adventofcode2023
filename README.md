@@ -114,6 +114,13 @@ see https://adventofcode.com/2023
   solution to AoC 2021, Day 15, to enforce constraints on direction and
   number of steps in the same direction.
 
+
+* **Day 21** (Go) Given a map of points and rocks, find the number of points //
+  that can be reached in n steps, starting from a given point. Used Djikstra's
+  algorithm to find the shortest path to every point, and then count the number
+  of points that can be reached in n steps. For Part 2, assume a much larger
+  number of steps, infeasible using brute force (*to do*).
+
 * **Day 24** (Go): Given a list of stones, each with a position and velocity,
   find the number stones whose trajectories will intersect. For Part 2, find
   the position and velocity of a new stone, whose trajectory will intersect
