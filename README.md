@@ -120,7 +120,7 @@ see https://adventofcode.com/2023
   much bigger shape, that cannot be computed in memory. Did Part 1 using
   simple recursive flood fill, Part 2 using go-geom library.
 
-* **Day 19**: (Go) Given a set of rules, and a set of parts, determine which
+* **Day 19** (Go): Given a set of rules, and a set of parts, determine which
   parts are accepted by the rules. Rules are a series of tests, each of which
   is either a comparison or a destination. A comparison is of the form
   "s<1351:dest", where "s" is an attribute, "<" is a comparator, "1351" is a
@@ -130,10 +130,10 @@ see https://adventofcode.com/2023
 
 * **Day 20**: *To do*
 
-* **Day 21** (Go): Given a map of points and rocks, find the number of points //
-  that can be reached in n steps, starting from a given point. Used Djikstra's
-  algorithm to find the shortest path to every point, and then count the number
-  of points that can be reached in n steps. For Part 2, assume a much larger
+* **Day 21** (Go): Given a map of points and rocks, find the number of points
+  that can be reached in n steps, starting from a given point. Used Djikstra's 
+  algorithm to find the shortest path to every point, and then count the number 
+  of points that can be reached in n steps. For Part 2, assume a much larger 
   number of steps, infeasible using brute force (*to do*).
 
 * **Day 22**: *To do*
@@ -141,14 +141,24 @@ see https://adventofcode.com/2023
 * **Day 23** (Go): Find the maximum number of steps (longest path) from top to
   bottom of a grid, ignorning blocks (hash marks), and not revisiting previous
   cells. In Part 1, pointer chars indicate that you must move in that direction
-  (restriction removed in Part 2). Hard problem, used brute force, but could
-  probably simplify the graph to reduce the search space.
+  (restriction removed in Part 2). Hard problem, used recursive depth-first 
+  search (brute force), used brute force, but could probably simplify the graph 
+  to reduce the search space.
 
 * **Day 24** (Go): Given a list of stones, each with a position and velocity,
   find the number stones whose trajectories will intersect. For Part 2, find
   the position and velocity of a new stone, whose trajectory will intersect
   with that of every other stone (*incomplete*).
 
+* **Day 25** (Go): Given a graph of nodes ("components"), find the three edges
+  ("wires") you need to disconnect in order to divide the graph into two
+  separate groups, multiply the sizes of these two groups together. Used
+  yourbasic/graph to create graph, and calculated the total distance from node
+  0 to all other nodes, tried all combinations of the 100 nodes with the
+  highest graph distnce when removed, to check if graph has 2 components (i.e.,
+  subgraphs not connected together). Picking the edges that resulted in
+  the highest total graph distance was necessary because it's too much
+  computation to consider all 3-edge combinations amount the ~3500 edges.
 
 To compile and run a **Go** program
 * Change into the directory with the program

@@ -27,7 +27,7 @@ var Parts []Part
 // Either a comparison witor a destination
 type Test struct {
 	a    string // attribute name, e.g., "s"
-	cmp  byte   // comparator, e.g., '<', '>' or 0 if destination
+	cmp  string // comparator, e.g., "<", ">" or empty if destination
 	n    int    // number to compare against
 	dest string // destination if comparison is true
 }
@@ -52,7 +52,7 @@ func main() {
 
 	// Part 2: determine many parts, within a universe of 0..4000,
 	// would be accepted
-	part2()
+	fmt.Println("Part 2 (19114, 397643):", part2())
 }
 
 // PART 1
@@ -80,16 +80,16 @@ func applyRule(r []Test, p Part) string {
 
 		// Expect "s<1351:dest" for comparison
 		// Otherwise it's a destination
-		if t.cmp == 0 {
+		if len(t.cmp) == 0 {
 			return t.dest
 		}
 
 		// Evaluate "s<1351:dest"
 		val, ok := p[t.a]
 		assert(ok, "Attribute not found")
-		if t.cmp == '<' && val < t.n {
+		if t.cmp == "<" && val < t.n {
 			return t.dest
-		} else if t.cmp == '>' && val > t.n {
+		} else if t.cmp == ">" && val > t.n {
 			return t.dest
 		}
 	}
@@ -100,6 +100,7 @@ func applyRule(r []Test, p Part) string {
 
 // PART 2
 
+// Global lists of test lists that lead to acceptance, rejection
 var Accepts, Rejects [][]Test
 
 // Part 2: determine how many parts could be accepted, out of
@@ -113,22 +114,15 @@ var Accepts, Rejects [][]Test
 // Subsequent rules:
 // - take the previous rule, negate it, add it to the "and" list
 // - enumerate that rule
-func part2() {
+func part2() int {
 
 	Accepts = [][]Test{}
 	Rejects = [][]Test{}
 
-	r := Rules["in"] // start with rule "in"
-	enumerate(r, []Test{})
+	// Recursively enumerate, starting with rule "in"
+	enumerate(Rules["in"], []Test{})
 
-	fmt.Println("Accept:", Accepts)
-	fmt.Println("Reject:", Rejects)
-
-	/*for _, t := range r { // each test in the rule
-		enumerate(t, []Test{}) // enumerate all rules
-	}*/
-	//fmt.Println("Part 2:", r)
-
+	return 0
 }
 
 // Enumerate a rule, i.e., recursively build up lists of tests
@@ -136,20 +130,34 @@ func part2() {
 // Rule at front of list gets enumerated, along with all the
 func enumerate(tests []Test, prevCond []Test) {
 
-	//fmt.Println("Enumerating", r, prevCond)
+	// fmt.Println("Enumerating", r, prevCond)
 	// TODO: could be other terminal
-	if len(tests) == 1 && tests[0].cmp == 0 {
-		if tests[0].dest == "A" {
-			Accepts = append(Accepts, prevCond)
-		} else if tests[0].dest == "R" {
-			Rejects = append(Rejects, prevCond)
-		}
+	if tests[0].dest == "A" {
+		Accepts = append(Accepts, prevCond)
+		return
+	} else if tests[0].dest == "R" {
+		Rejects = append(Rejects, prevCond)
 		return
 	}
 
-	// Enumerate the first rule
-	prevCond = append(prevCond, tests[0])
-	enumerate(tests[1:], prevCond)
+	// Enumerate each rule
+	for len(tests) > 0 {
+		enumerate(tests[:1], prevCond)
+		prevCond = append(prevCond, negate(tests[0]))
+		tests = tests[1:]
+	}
+}
+
+// Negate a condition, by flipping >/<= etc.
+func negate(t Test) Test {
+	opposite := map[string]string{"<": ">=", "<=": ">", ">": "<=", ">=": "<"}
+	cmp1, ok := opposite[t.cmp]
+	if !ok {
+		panic("Invalid operator")
+	}
+	t1 := t
+	t1.cmp = cmp1
+	return t1
 }
 
 // LOAD DATA
@@ -209,8 +217,8 @@ func parseTest(test string) Test {
 	}
 	// Otherwise assign comparator and number
 	lr := strings.Split(test, ":")
-	t.a = lr[0][:1]  // attribute name, e.g., "s"
-	t.cmp = lr[0][1] // comparator, e.g., '<'
+	t.a = lr[0][:1]          // attribute name, e.g., "s"
+	t.cmp = string(lr[0][1]) // comparator, e.g., '<'
 	t.n = atoi(lr[0][2:])
 	t.dest = lr[1] // destination for this test
 	return t
