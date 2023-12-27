@@ -122,11 +122,12 @@ see https://adventofcode.com/2023
 
 * **Day 19** (Go): Given a set of rules, and a set of parts, determine which
   parts are accepted by the rules. Rules are a series of tests, each of which
-  is either a comparison or a destination. A comparison is of the form
-  "s<1351:dest", where "s" is an attribute, "<" is a comparator, "1351" is a
-  number, and "dest" is a destination.  For Part 2, determine how many parts,
-  within a universe of 0..4000 for each of the four parameters, would be
-  accepted (*to do*).
+  is either a comparison (e.g., "s<1351:dest") or a destination.  For Part 2,
+  determine how many parts, within a universe of 0..4000 for each of the four
+  parameters, would be accepted. Did this by recursively evaluating the rules,
+  to come up with a list of "and" conditions for each "A" terminal node. For
+  each "A" rule, the number of parts accepted is the product of the widths of
+  the four resulting ranges.
 
 * **Day 20**: *To do*
 

@@ -2,13 +2,15 @@
 //
 // Given a set of rules, and a set of parts, determine which parts
 // are accepted by the rules. Rules are a series of tests, each of
-// which is either a comparison or a destination. A comparison is
-// of the form "s<1351:dest", where "s" is an attribute, "<" is a
-// comparator, "1351" is a number, and "dest" is a destination.
+// which is either a comparison (e.g., "s<1351:dest") or a destination.
 // For Part 2, determine how many parts, within a universe of 0..4000
-// for each of the four parameters, would be accepted (*to do*).
+// for each of the four parameters, would be accepted. Did this by
+// recursively evaluating the rules, to come up with a list of "and"
+// conditions for each "A" terminal node. For each "A" rule, the number
+// of parts accepted is the product of the widths of the four resulting
+// ranges.
 //
-// AK, 19 Dec 2023
+// AK, 19-27 Dec 2023
 
 package main
 
@@ -36,13 +38,15 @@ type Test struct {
 var Rules map[string][]Test
 
 // For Part 2, a global lists of lists of conditions that lead to acceptance
+// or rejection
 var Accepts [][]Test
 
 func main() {
 
 	// Read the input file
-	loadData("sample.txt")
-	//loadData("input.txt")
+	fname := "sample.txt"
+	fname = "input.txt"
+	loadData(fname)
 
 	// Part 1: Process each part, add up attributes of accepted parts
 	ans := 0
@@ -53,11 +57,10 @@ func main() {
 	}
 	fmt.Println("Part 1 (19114, 397643):", ans) // 19114, 397643
 
-	// Part 2: determine many parts, within a universe of 0..4000,
-	// would be accepted
+	// Part 2: determine many parts, within a universe of 0..4000 for
+	// each attribute, would be accepted
 	ans2 := part2()
-	fmt.Println("Part 2 (167409079868000):", ans2)
-	fmt.Println(float64(ans2) / float64(167409079868000))
+	fmt.Println("Part 2 (s/b 167409079868000, 132392981697081):", ans2)
 }
 
 // PART 1
@@ -109,65 +112,65 @@ func applyRule(r []Test, p Part) string {
 // a universe where each parameter ranges from 0 to 4000.
 func part2() int64 {
 
-	// Recursively enumerate, starting with rule "in", building up
-	// chains of Acceptance conditions in the global variable Accept
+	// Recursively enumerate rules, starting with rule "in", building up
+	// chains of Accept conditions in the global variable, basically
+	// root-to-terminal paths in decision tree
 	enumerate(Rules["in"], []Test{})
 
-	// Process each list of Accept conditions, to get the number of
-	// parts that would be accepted, assuming that x/m/a/s can each range
-	// from 1..4000
-	var ans int64
+	// Apply each set of "Accept" conditions to determine the ranges
+	// implied for each of the four attributes. Multiply the width of
+	// these four ranges together, to get the number of parts that
+	// would match each set of tests.
 	xmas := []string{"x", "m", "a", "s"}
+	var ans int64
 	for _, tests := range Accepts {
 
-		fmt.Println(tests)
-
-		// Create a list of 4000 zeros for each of the four attributes
-		bits := map[string][]int{}
+		// Initialize min & max of ranges for x,m,a,s with
+		// 1 as the minimum, 4000 as the maximum.
+		minVal := map[string]int{}
+		maxVal := map[string]int{}
 		for _, a := range xmas {
-			bits[a] = fill(4000, 0)
+			minVal[a] = 1
+			maxVal[a] = 4000
 		}
 
-		// Apply each test
+		// Apply each condition, modifying the range limits for the
+		// affected attribute accordingly
 		for _, t := range tests {
 			if t.cmp == "<" {
-				setBits(bits[t.a], 1, t.n-1, 1) // turn on 1..n-1
+				if t.n-1 < maxVal[t.a] {
+					maxVal[t.a] = t.n - 1
+				}
 			} else if t.cmp == "<=" {
-				setBits(bits[t.a], 1, t.n, 1) // turn on 1..n
+				if t.n < maxVal[t.a] {
+					maxVal[t.a] = t.n
+				}
 			} else if t.cmp == ">" {
-				setBits(bits[t.a], t.n+1, 4000, 1) // turn on n+1..4000
+				if t.n+1 > minVal[t.a] {
+					minVal[t.a] = t.n + 1
+				}
 			} else if t.cmp == ">=" {
-				setBits(bits[t.a], t.n, 4000, 1) // turn on n..4000
-			} else {
-				panic("Invalid operator: " + t.cmp)
+				if t.n > minVal[t.a] {
+					minVal[t.a] = t.n
+				}
 			}
 		}
 
-		// Any attribute that has no bits set is assumed to be all ones
+		// The number of parts affected by this rule is just the
+		// widths of the four ranges multiplied together
+		var c int64 = 1 // the count for this rule
 		for _, a := range xmas {
-			if sum(bits[a]) == 0 {
-				setBits(bits[a], 1, 4000, 1)
-			}
+			rng := maxVal[a] - minVal[a] + 1 // range width
+			c *= int64(rng)
 		}
-
-		// Determine the total number of parts enabled by this rule
-		// TODO: Isn't this double counting, as the same parts may be
-		// affected by multiple rules?
-		var accepts int64 = 1
-		for _, a := range xmas {
-			accepts *= sum(bits[a])
-		}
-
-		fmt.Println("Subtotal for this rule:", accepts)
-		ans += accepts
+		ans += c
+		//fmt.Println(tests, minVal, maxVal, c)
 	}
-
 	return ans
 }
 
 // Enumerate a rule, i.e., recursively build up lists of tests
-// that lead to "A" or "R"
-// Rule at front of list gets enumerated, along with all the
+// that lead to "A"
 func enumerate(tests []Test, conds []Test) {
 
 	// Make a copy of the conditions
@@ -176,21 +179,35 @@ func enumerate(tests []Test, conds []Test) {
 	// Process each test
 	for _, t := range tests {
 
-		// If no comparison, add to list if Accept, or evaluate
-		// destination
+		// If just a destination with no comparison, add conditions
+		// to "Accept" list if "A", or evaluate this destination
 		if len(t.cmp) == 0 {
 			if t.dest == "A" {
 				Accepts = append(Accepts, conds)
-			} else if t.dest != "R" { // ignore Reject conditions
+				//fmt.Println("Found Accept chain:", conds)
+			} else if t.dest != "R" { // rule destination without condition
+				//fmt.Println("Evaluating non-condition rule", t.dest)
 				enumerate(Rules[t.dest], copyTests(conds))
 			}
 
 			// Otherwise, evaluate left-hand side, then add negation of
 			// this test to list of conditions
 		} else {
+
+			// Evaluate left hand side, with this test added to conditions,
+			// so it can be included in further tests for this rule (right
+			// branch implies negation of the left branch)
 			conds1 := copyTests(conds)
 			conds1 = append(conds1, t)
-			enumerate(Rules[t.dest], conds1)
+			if t.dest == "A" { // TODO: This seems redundant
+				Accepts = append(Accepts, conds1)
+				//fmt.Println("Found Accept chain:", conds1)
+			} else if t.dest != "R" {
+				//fmt.Println("Evaluating condition rule", t.dest)
+				enumerate(Rules[t.dest], conds1)
+			}
+
+			// Add negation of this condition to the list of conditions
 			conds = append(conds, negate(t))
 		}
 	}
@@ -213,32 +230,6 @@ func negate(t Test) Test {
 	t1 := t
 	t1.cmp = cmp1
 	return t1
-}
-
-// Turn on bits (numbers) in an array, setting them to 1
-// Numbers are 1 indexed, but array indices are zero based
-func setBits(bits []int, start, end, value int) {
-	for i := start - 1; i < end-1; i++ {
-		bits[i] = value
-	}
-}
-
-// Create an array filled with given value
-func fill(n, value int) []int {
-	res := make([]int, n, n)
-	for i := 0; i < n; i++ {
-		res[i] = value
-	}
-	return res
-}
-
-// Sum up a list of ints
-func sum(nums []int) int64 {
-	var res int
-	for i := 0; i < len(nums); i++ {
-		res += nums[i]
-	}
-	return int64(res)
 }
 
 // LOAD DATA
@@ -277,14 +268,6 @@ func loadData(fname string) {
 			}
 		}
 	}
-	/*fmt.Println("Rules:")
-	for k, v := range Rules {
-		fmt.Println(k, "=", v)
-	}
-	fmt.Println("Parts:")
-	for _, p := range Parts {
-		fmt.Println(p)
-	}*/
 }
 
 // Parse a test, e.g., "s<1351:dest"
