@@ -1,8 +1,12 @@
-// Advent of Code 2023, Day 10
+// Advent of Code 2023, Day 22
 //
+// Given a set of long bricks, each defined by two points in 3d space,
+// determine which bricks can be removed without causing any other
+// bricks to fall. For Part 2, determine how many bricks can be
+// removed without causing any other bricks to fall. Fairly straightforward
+// simulation, not very efficient.
 //
-//
-// AK, 10 Dec 2023
+// AK, 27 Dec 2023
 
 package main
 
@@ -44,27 +48,35 @@ func main() {
 
 	// Part 1: try removing each brick, see if it affects any other bricks
 	fmt.Println("Doing initial jiggle")
-	bb, _ := jiggle(bricks) // jiggle so all bricks are at the bottom
-	var ans int
+	bb, _ := jiggle(bricks) // let all bricks fall to bottom
+	var part1, part2 int
 	for i := 0; i < len(bb); i++ {
 		fmt.Print("Brick ", i, " of ", len(bb))
-		bb[i].removed = true   // make this brick removed
-		_, moved := jiggle(bb) // jiggle, see if anything moved
-		if !moved {            // if nothing move, okay to remove this
+		bb[i].removed = true     // remove this brick
+		bb2, moved := jiggle(bb) // jiggle, see if anything moved
+		if !moved {              // if nothing moved, okay to remove this
 			fmt.Println(" can be safely removed")
-			ans++
+			part1++
 		} else { // Otherwise, cannot remov it
 			fmt.Println(" cannot be removed")
 		}
+		numberMoved := diff(bb, bb2) // how many other bricks have moved?
+		if numberMoved > 0 {
+			fmt.Printf("  %d other bricks have moved\n", numberMoved)
+			part2 += numberMoved
+		}
 		bb[i].removed = false // put the brick back
 	}
-	fmt.Println("Part 1 (5, 485):", ans)
-
+	fmt.Println("Part 1 (5, 485):", part1)
+	fmt.Println("Part 2 (7, 74594):", part2)
 }
 
 // "Jiggle" the space so all bricks fall to the lowest possible position,
 // i.e., move down vertically, but don't intersect with anything else.
 // Returns revised list of brick positions, and true if any bricks were moved.
+// This is very slow, might be faster if we sort bricks by bottom location
+// and start at the bottom, and allow bricks to fall by more than one step
+// at a time.
 func jiggle(bricks []Brick) ([]Brick, bool) {
 
 	// Make a copy of the bricks
@@ -91,7 +103,7 @@ func jiggle(bricks []Brick) ([]Brick, bool) {
 			// If any collisions, move brick back, otherwise leave it
 			// and note that we have moved something
 			space := getSpace(bb, true)
-			if len(space) == 0 { // i.e., overlap found, was anyOverlaps(space) {
+			if len(space) == 0 { // i.e., overlap found
 				bb[i].start.z++
 				bb[i].end.z++
 			} else {
@@ -108,16 +120,6 @@ func jiggle(bricks []Brick) ([]Brick, bool) {
 
 	// Return updated list of bricks, and whether any bricks were moved
 	return bb, anyMoved
-}
-
-// Determine whether there are any overlaps in the space
-func anyOverlaps(space map[Point]int) bool {
-	for _, v := range space {
-		if v > 1 {
-			return true
-		}
-	}
-	return false
 }
 
 // Return a map of space positions that are filled by a brick,
@@ -156,6 +158,21 @@ func getSpace(bricks []Brick, stopIfOverlaps bool) map[Point]int {
 
 	// Return map of points occouped
 	return points
+}
+
+// For part 2, compare two stacks of bricks, and report
+// how many have changed in position
+func diff(bb1, bb2 []Brick) int {
+	if len(bb1) != len(bb2) {
+		panic("diff() received different length lists")
+	}
+	var ans int
+	for i := 0; i < len(bb1); i++ {
+		if bb1[i] != bb2[i] {
+			ans++
+		}
+	}
+	return ans
 }
 
 // Parse an integer, show message and return -1 if error

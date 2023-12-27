@@ -137,7 +137,11 @@ see https://adventofcode.com/2023
   of points that can be reached in n steps. For Part 2, assume a much larger 
   number of steps, infeasible using brute force (*to do*).
 
-* **Day 22**: *To do*
+* **Day 22** (Go): Given a set of long bricks, each defined by two points 
+  in 3d space, determine which bricks can be removed without causing any other
+  bricks to fall. For Part 2, determine how many bricks can be removed without
+  causing any other bricks to fall. Fairly straightforward simulation, not very
+  efficient.
 
 * **Day 23** (Go): Find the maximum number of steps (longest path) from top to
   bottom of a grid, ignorning blocks (hash marks), and not revisiting previous
