@@ -151,5 +151,7 @@ Determine the exact position and velocity the rock needs to have at time 0 so
 that it perfectly collides with every hailstone. What do you get if you add up
 the X, Y, and Z coordinates of that initial position?
 
-Answer: 
+Your puzzle answer was 641619849766168.
+
+Both parts of this puzzle are complete! They provide two gold stars: **
 

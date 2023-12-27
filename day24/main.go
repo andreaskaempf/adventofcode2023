@@ -3,9 +3,10 @@
 // Given a list of stones, each with a position and velocity, find
 // the number stones whose trajectories will intersect. For Part 2,
 // find the position and velocity of a new stone, whose trajectory
-// will intersect with that of every other stone.
+// will intersect with that of every other stone. Part 2 done using
+// constraint solvers (Centipede in Go and Z3 from Python).
 //
-// AK, 24 Dec 2023 (Part 1)
+// AK, 24 and 26 Dec 2023
 
 package main
 
@@ -111,7 +112,9 @@ func intersect(A, B Stone) (float64, float64) {
 }
 
 // Part 2: find the position and velocity of another stone, in three
-// dimensions, so that it collides with all the other stones
+// dimensions, so that it collides with all the other stones. This
+// is a constraint satisfaction problem, solved using a constraint
+// solver (Centipede in Go and Z3 from Python).
 func part2() int {
 
 	A := stones[0]
@@ -132,9 +135,9 @@ func part2() int {
 	fmt.Println(xA, yA, zA)
 	fmt.Println(xX, yX, zX)
 
-	// Find stone X (6 vals), such that
+	// Find parameters of stone X (6 vals), such that
 	// pos(X) == pos(A) at some time, for every stone A
-	// Optimization formulation:
+	// Optimization/constraint formulation:
 	// - x,y,z and vx,vy,vz for new stone are variables
 	// - t values for each stone are variables (not used)
 	// - constraints are
@@ -143,6 +146,10 @@ func part2() int {
 	//       z1 + vz1 * t1 == zX + vzX * t1
 	// - Not really an objective function, except to make
 	//   sure there is a t for every stone
+
+	// Use Centipede constraint solver to solve this, also
+	// see part2.py for Z3 version
+	//part2a()
 
 	return 0
 }

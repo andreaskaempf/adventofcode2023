@@ -148,7 +148,8 @@ see https://adventofcode.com/2023
 * **Day 24** (Go): Given a list of stones, each with a position and velocity,
   find the number stones whose trajectories will intersect. For Part 2, find
   the position and velocity of a new stone, whose trajectory will intersect
-  with that of every other stone (*incomplete*).
+  with that of every other stone. Part 2 done using constraint solvers 
+  (Centipede in Go and Z3 from Python).
 
 * **Day 25** (Go): Given a graph of nodes ("components"), find the three edges
   ("wires") you need to disconnect in order to divide the graph into two

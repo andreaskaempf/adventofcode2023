@@ -35,6 +35,9 @@ type Test struct {
 // Global dictionary of rules, each a list of sequential tests
 var Rules map[string][]Test
 
+// For Part 2, a global lists of lists of conditions that lead to acceptance
+var Accepts [][]Test
+
 func main() {
 
 	// Read the input file
@@ -52,7 +55,9 @@ func main() {
 
 	// Part 2: determine many parts, within a universe of 0..4000,
 	// would be accepted
-	fmt.Println("Part 2 (19114, 397643):", part2())
+	ans2 := part2()
+	fmt.Println("Part 2 (167409079868000):", ans2)
+	fmt.Println(float64(ans2) / float64(167409079868000))
 }
 
 // PART 1
@@ -100,52 +105,102 @@ func applyRule(r []Test, p Part) string {
 
 // PART 2
 
-// Global lists of test lists that lead to acceptance, rejection
-var Accepts, Rejects [][]Test
-
 // Part 2: determine how many parts could be accepted, out of
 // a universe where each parameter ranges from 0 to 4000.
+func part2() int64 {
 
-// Take a rule (series of tests).
-// First one: enumerate it, with zero-length "and" list of rules
-// Enumerate takes the first rule in list:
-// - if it's terminal (A or R), add it to the global list of terminals
-// - otherwise, enumerate that rule, with list of "and" rules
-// Subsequent rules:
-// - take the previous rule, negate it, add it to the "and" list
-// - enumerate that rule
-func part2() int {
-
-	Accepts = [][]Test{}
-	Rejects = [][]Test{}
-
-	// Recursively enumerate, starting with rule "in"
+	// Recursively enumerate, starting with rule "in", building up
+	// chains of Acceptance conditions in the global variable Accept
 	enumerate(Rules["in"], []Test{})
 
-	return 0
+	// Process each list of Accept conditions, to get the number of
+	// parts that would be accepted, assuming that x/m/a/s can each range
+	// from 1..4000
+	var ans int64
+	xmas := []string{"x", "m", "a", "s"}
+	for _, tests := range Accepts {
+
+		fmt.Println(tests)
+
+		// Create a list of 4000 zeros for each of the four attributes
+		bits := map[string][]int{}
+		for _, a := range xmas {
+			bits[a] = fill(4000, 0)
+		}
+
+		// Apply each test
+		for _, t := range tests {
+			if t.cmp == "<" {
+				setBits(bits[t.a], 1, t.n-1, 1) // turn on 1..n-1
+			} else if t.cmp == "<=" {
+				setBits(bits[t.a], 1, t.n, 1) // turn on 1..n
+			} else if t.cmp == ">" {
+				setBits(bits[t.a], t.n+1, 4000, 1) // turn on n+1..4000
+			} else if t.cmp == ">=" {
+				setBits(bits[t.a], t.n, 4000, 1) // turn on n..4000
+			} else {
+				panic("Invalid operator: " + t.cmp)
+			}
+		}
+
+		// Any attribute that has no bits set is assumed to be all ones
+		for _, a := range xmas {
+			if sum(bits[a]) == 0 {
+				setBits(bits[a], 1, 4000, 1)
+			}
+		}
+
+		// Determine the total number of parts enabled by this rule
+		// TODO: Isn't this double counting, as the same parts may be
+		// affected by multiple rules?
+		var accepts int64 = 1
+		for _, a := range xmas {
+			accepts *= sum(bits[a])
+		}
+
+		fmt.Println("Subtotal for this rule:", accepts)
+		ans += accepts
+	}
+
+	return ans
 }
 
 // Enumerate a rule, i.e., recursively build up lists of tests
 // that lead to "A" or "R"
 // Rule at front of list gets enumerated, along with all the
-func enumerate(tests []Test, prevCond []Test) {
+func enumerate(tests []Test, conds []Test) {
 
-	// fmt.Println("Enumerating", r, prevCond)
-	// TODO: could be other terminal
-	if tests[0].dest == "A" {
-		Accepts = append(Accepts, prevCond)
-		return
-	} else if tests[0].dest == "R" {
-		Rejects = append(Rejects, prevCond)
-		return
-	}
+	// Make a copy of the conditions
+	conds = copyTests(conds)
 
-	// Enumerate each rule
-	for len(tests) > 0 {
-		enumerate(tests[:1], prevCond)
-		prevCond = append(prevCond, negate(tests[0]))
-		tests = tests[1:]
+	// Process each test
+	for _, t := range tests {
+
+		// If no comparison, add to list if Accept, or evaluate
+		// destination
+		if len(t.cmp) == 0 {
+			if t.dest == "A" {
+				Accepts = append(Accepts, conds)
+			} else if t.dest != "R" { // ignore Reject conditions
+				enumerate(Rules[t.dest], copyTests(conds))
+			}
+
+			// Otherwise, evaluate left-hand side, then add negation of
+			// this test to list of conditions
+		} else {
+			conds1 := copyTests(conds)
+			conds1 = append(conds1, t)
+			enumerate(Rules[t.dest], conds1)
+			conds = append(conds, negate(t))
+		}
 	}
+}
+
+// Make copy of a list of tests
+func copyTests(tests []Test) []Test {
+	var res []Test
+	res = append(res, tests...)
+	return res
 }
 
 // Negate a condition, by flipping >/<= etc.
@@ -158,6 +213,32 @@ func negate(t Test) Test {
 	t1 := t
 	t1.cmp = cmp1
 	return t1
+}
+
+// Turn on bits (numbers) in an array, setting them to 1
+// Numbers are 1 indexed, but array indices are zero based
+func setBits(bits []int, start, end, value int) {
+	for i := start - 1; i < end-1; i++ {
+		bits[i] = value
+	}
+}
+
+// Create an array filled with given value
+func fill(n, value int) []int {
+	res := make([]int, n, n)
+	for i := 0; i < n; i++ {
+		res[i] = value
+	}
+	return res
+}
+
+// Sum up a list of ints
+func sum(nums []int) int64 {
+	var res int
+	for i := 0; i < len(nums); i++ {
+		res += nums[i]
+	}
+	return int64(res)
 }
 
 // LOAD DATA
