@@ -1,4 +1,5 @@
 lp
 graph
 go.mod
+go.sum
 times.txt
