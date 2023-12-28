@@ -129,7 +129,14 @@ see https://adventofcode.com/2023
   each "A" rule, the number of parts accepted is the product of the widths of
   the four resulting ranges.
 
-* **Day 20**: *To do*
+* **Day 20** (Go): Given a list of components and their outputs, simulate the 
+  execution of signal transmission between the components when a "button" is
+  pressed.  For Part 1, determine the total number of low & high signals sent
+  over 1000 button presses (done by simple simulation). For Part 2, need to
+  determine how many button presses until one "rx" module receives a signal.
+  This was done by looking for cycles in the four inputs to the only input to
+  rx, and multiplying these cycle lengths together to give the times when the
+  cycles coincide.
 
 * **Day 21** (Go): Given a map of points and rocks, find the number of points
   that can be reached in n steps, starting from a given point. Used Djikstra's 
@@ -150,7 +157,7 @@ see https://adventofcode.com/2023
   search (brute force), used brute force, but could probably simplify the graph 
   to reduce the search space.
 
-* **Day 24** (Go): Given a list of stones, each with a position and velocity,
+* **Day 24** (Go, Python): Given a list of stones, each with a position and velocity,
   find the number stones whose trajectories will intersect. For Part 2, find
   the position and velocity of a new stone, whose trajectory will intersect
   with that of every other stone. Part 2 done using constraint solvers 

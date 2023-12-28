@@ -3,3 +3,4 @@ graph
 go.mod
 go.sum
 times.txt
+test*.py
