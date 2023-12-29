@@ -139,10 +139,11 @@ see https://adventofcode.com/2023
   cycles coincide.
 
 * **Day 21** (Go): Given a map of points and rocks, find the number of points
-  that can be reached in n steps, starting from a given point. Used Djikstra's 
-  algorithm to find the shortest path to every point, and then count the number 
-  of points that can be reached in n steps. For Part 2, assume a much larger 
-  number of steps, infeasible using brute force (*to do*).
+  that can be reached in n steps, starting from a given point.  Used Djikstra's
+  algorithm (and later simple walk simulation) to find the number of points
+  that can be reached in n steps.  For Part 2, assume a much larger number of
+  steps, infeasible using brute force, so count tiles reached in 1x1, 3x3, and
+  5x5 area blocks, and extrapolate from these.
 
 * **Day 22** (Go): Given a set of long bricks, each defined by two points 
   in 3d space, determine which bricks can be removed without causing any other
@@ -168,10 +169,12 @@ see https://adventofcode.com/2023
   separate groups, multiply the sizes of these two groups together. Used
   yourbasic/graph to create graph, and calculated the total distance from node
   0 to all other nodes, tried all combinations of the 100 nodes with the
-  highest graph distnce when removed, to check if graph has 2 components (i.e.,
+  highest graph distance when removed, to check if graph has 2 components (i.e.,
   subgraphs not connected together). Picking the edges that resulted in
   the highest total graph distance was necessary because it's too much
   computation to consider all 3-edge combinations amount the ~3500 edges.
+  This was Part 1, there was no Part 2 (except for being able to push a
+  "button" provided that all previous gold stars were earned).
 
 To compile and run a **Go** program
 * Change into the directory with the program
