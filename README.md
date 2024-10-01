@@ -3,10 +3,10 @@
 My solutions for the Advent of Code 2023, 
 see https://adventofcode.com/2023
 
-* **Day 1** (Go): Find digits in a string, combine first and last digit on each
-  line to make a number, and add these up. For part 2, look for embedded names
-  of numbers as well, complicated as last & first letters are shared if they
-  are the same.
+* **Day 1** (Go, Rust): Find digits in a string, combine first and last digit
+  on each line to make a number, and add these up. For part 2, look for
+  embedded names of numbers as well, complicated as last & first letters are
+  shared if they are the same.
 
 * **Day 2** (Go): Given a list of games, each with a list of 
   red/green/blue cubes drawn from a bag, determine which games are possible 

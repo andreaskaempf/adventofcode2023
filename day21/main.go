@@ -70,6 +70,11 @@ func main() {
 	ans *= w                    // multiply by height in blocks
 	ans += x0                   // add the inner block
 	fmt.Println("Part 2:", ans) // 594115391548176
+
+	for i := 1; i <= 10; i++ {
+		n := i * 65
+		fmt.Println(n, walk(start, n))
+	}
 }
 
 // Simple simulation of walking n steps from start, returns
