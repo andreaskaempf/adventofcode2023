@@ -8,13 +8,13 @@ see https://adventofcode.com/2023
   embedded names of numbers as well, complicated as last & first letters are
   shared if they are the same.
 
-* **Day 2** (Go): Given a list of games, each with a list of 
+* **Day 2** (Go, Rust): Given a list of games, each with a list of 
   red/green/blue cubes drawn from a bag, determine which games are possible 
   with a given number of red, green, and blue cubes. For Part 2, determine 
   the minimum number of cubes of each colour required to play all the
   turns in a game, and multiply these together.
 
-* **Day 3** (Go): Given a 2-d surface of digits and special characters, 
+* **Day 3** (Go, Rust): Given a 2-d surface of digits and special characters, 
   find any embedded numbers that are adjacent to special characters, and
   add them up. For Part 2, find any pairs of numbers that are adjacent to 
   the same asterisk, and sum up the products of these pairs.
@@ -185,5 +185,14 @@ To compile and run a **Go** program
 To run a **Python** program
 * Change into the directory with the program
 * `python day06.py`
+
+To compile and run a **Rust** program
+* Change into the directory with the program
+* `rustc day01.rs`
+* `./day01`  (or whatever name of the executable)
+* If the program requires external dependencies ("crates"), you will 
+  have to do `cargo init`, move dayXX.rs to src, add the crate to
+  Cargo.toml, and then `cargo build` to compile; the executable will
+  be somewhere in the ./target directory.
 
 AK, Dec 2023
