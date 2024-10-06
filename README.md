@@ -38,14 +38,14 @@ see https://adventofcode.com/2023
   Go. In any language, a better algorithm would be faster, as would the
   addition of concurrency and/or memoization.
 
-* **Day 6** (Go): Simulate a toy boat race, in which you hold down a button
+* **Day 6** (Go, Rust): Simulate a toy boat race, in which you hold down a button
   to recharge a motor, which lets the boat go faster. Distance is the speed
   muliplied by remaining time. Find the number of ways you can hold down the
   button, so as to exceed the previous maximum distance given. For part 2, just
   one race, but much bigger number (still almost instantaneous using brute
   force).
 
-* **Day 7** (Go): Given some hands of 5 cards, sort them by poker rank. 
+* **Day 7** (Go, Rust): Given some hands of 5 cards, sort them by poker rank. 
   For part 2, replace instances of J (joker) with which ever other letter
   from the hand, that yields the best poker hand type. Answer for both 
   parts is the sumproduct of the rank (sorted sequence) times a given bid.
