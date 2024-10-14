@@ -26,7 +26,7 @@ see https://adventofcode.com/2023
   of the next n cards, where n is the number of matches, and count up the 
   cards at the end.
 
-* **Day 5** (Go, Rust, Zig): Given a list of "seeds" (numbers), go through a
+* **Day 5** (Go, Rust, Zig, C): Given a list of "seeds" (numbers), go through a
   series of transformations for each seed, based on tables. Each table is a
   tuple (dst, src, n). If the number is within src ..  src+n,  it is assigned
   to dst. If no dst is found, the dst is the same as src for that
