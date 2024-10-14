@@ -205,4 +205,8 @@ To compile and run a **Zig** program
 * zig build -Doptimize=ReleaseFast (*fast mode, takes < 2 mins*)
 * To run: zig-out/bin/day05
 
+To compile and run a **C** program
+* gcc -O3 day05.c -o day05
+* To run: ./day05
+
 AK, Dec 2023 and Oct 2024 (for Rust, Zig, C)
