@@ -33,11 +33,14 @@ see https://adventofcode.com/2023
   transformation. For Part 1, find the lowest final transformation. 
   Part 2 is the same, but treat each pair of "seeds" as start and length 
   of a range. Computationally intensive brute force approach takes about 5:40
-  minutes to run in Go, and the same algorithm about 3:45 in Rust in release
-  mode (197 mins in debug mode!), suggesting that Rust is about 50% faster than
-  Go. Zig implementation compiled with ReleaseFast option takes 1:51, half of
-  the Rust version. In any language, a better algorithm would be faster, as
-  would the addition of concurrency and/or memoization.
+  minutes to run in **Go**, and the same algorithm about 3:45 in **Rust** in 
+  release mode (197 mins in debug mode!), suggesting that Go takes about 50% 
+  more time than Rust. **Zig** implementation compiled with ReleaseFast 
+  option takes 1:51, half of the Rust version. And Zig is even faster than 
+  **C**, which takes 2:40 using gcc with the -O3 optimization option. This is
+  just an indicative benchmark using a naive implementation -- in any 
+  language, a better algorithm would be faster, as would the addition of 
+  concurrency and/or memoization.
 
 * **Day 6** (Go, Rust): Simulate a toy boat race, in which you hold down a button
   to recharge a motor, which lets the boat go faster. Distance is the speed
@@ -200,13 +203,13 @@ To compile and run a **Rust** program
   be somewhere in the ./target directory.
 
 To compile and run a **Zig** program
-* Change into the zig dirrectory, e.g., day05/zig
-* zig build (*debug mode, day05 runs in ~15 mins*)
-* zig build -Doptimize=ReleaseFast (*fast mode, takes < 2 mins*)
-* To run: zig-out/bin/day05
+* Change into the zig directory, e.g., `cd day05/zig`
+* `zig build` (*debug mode, day05 runs in ~15 mins*)
+* `zig build -Doptimize=ReleaseFast` (*fast mode, takes < 2 mins*)
+* To run: `zig-out/bin/day05`
 
 To compile and run a **C** program
-* gcc -O3 day05.c -o day05
-* To run: ./day05
+* `gcc -O3 day05.c -o day05`
+* To run: `./day05`
 
 AK, Dec 2023 and Oct 2024 (for Rust, Zig, C)
