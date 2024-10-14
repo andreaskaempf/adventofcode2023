@@ -26,17 +26,18 @@ see https://adventofcode.com/2023
   of the next n cards, where n is the number of matches, and count up the 
   cards at the end.
 
-* **Day 5** (Go, Rust): Given a list of "seeds" (numbers), go through a series 
-  of transformations for each seed, based on tables. Each table is a tuple 
-  (dst, src, n). If the number is within src ..  src+n,  it is assigned 
-  to dst. If no dst is found, the dst is the same as src for that 
+* **Day 5** (Go, Rust, Zig): Given a list of "seeds" (numbers), go through a
+  series of transformations for each seed, based on tables. Each table is a
+  tuple (dst, src, n). If the number is within src ..  src+n,  it is assigned
+  to dst. If no dst is found, the dst is the same as src for that
   transformation. For Part 1, find the lowest final transformation. 
   Part 2 is the same, but treat each pair of "seeds" as start and length 
   of a range. Computationally intensive brute force approach takes about 5:40
   minutes to run in Go, and the same algorithm about 3:45 in Rust in release
   mode (197 mins in debug mode!), suggesting that Rust is about 50% faster than
-  Go. In any language, a better algorithm would be faster, as would the
-  addition of concurrency and/or memoization.
+  Go. Zig implementation compiled with ReleaseFast option takes 1:51, half of
+  the Rust version. In any language, a better algorithm would be faster, as
+  would the addition of concurrency and/or memoization.
 
 * **Day 6** (Go, Rust): Simulate a toy boat race, in which you hold down a button
   to recharge a motor, which lets the boat go faster. Distance is the speed
@@ -198,4 +199,10 @@ To compile and run a **Rust** program
   Cargo.toml, and then `cargo build` to compile; the executable will
   be somewhere in the ./target directory.
 
-AK, Dec 2023
+To compile and run a **Zig** program
+* Change into the zig dirrectory, e.g., day05/zig
+* zig build (*debug mode, day05 runs in ~15 mins*)
+* zig build -Doptimize=ReleaseFast (*fast mode, takes < 2 mins*)
+* To run: zig-out/bin/day05
+
+AK, Dec 2023 and Oct 2024 (for Rust, Zig, C)
