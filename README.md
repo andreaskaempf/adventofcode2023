@@ -72,11 +72,10 @@ see https://adventofcode.com/2023
   Part 2, count up how many positions are *not* inside the shape (solved using
   ray tracing method).
 
-* **Day 11** (Go): Given a 2D terrain of symbols, start at 'S' and follow the
-  Given a 2D field of 'galaxies' surrounded by space, first 'expand' this by
-  doubling each row/column that is empty, and add up the manhattan distance
-  between every pair. For Part 2, expand by factor of a million instead of
-  doubling.
+* **Day 11** (Go, Rust): Given a 2D field of 'galaxies' surrounded by space, 
+  first 'expand' this by doubling each row/column that is empty, and add up 
+  the manhattan distances between all the pairs. For Part 2, expand by factor 
+  of a million instead of doubling. 
 
 * **Day 12** (Go): Given a pattern of '#', '.', and '?' symbols, and a list of
   numbers representing the lengths of blocks of '#', find the number of
